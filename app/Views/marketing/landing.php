@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 declare(strict_types=1);
 if (!empty($contactEmail)) {
     $emailHref = !empty($mailTo) ? $mailTo : 'mailto:' . $contactEmail;
@@ -10,7 +10,7 @@ if (!empty($contactEmail)) {
     <div class="container marketing-nav">
         <a href="<?= e(url('/')); ?>" class="marketing-brand">
             <span class="marketing-brand-mark">
-                <img src="<?= e(url('/assets/images/peoplova-mark-white.svg')); ?>" alt="<?= e($productName); ?> logo" style="height:1.2rem;width:auto;">
+                <img src="<?= e(url('/assets/images/Byblos HR-mark-white.svg')); ?>" alt="<?= e($productName); ?> logo" style="height:1.2rem;width:auto;">
             </span>
             <span>
                 <strong><?= e($productName); ?></strong>
@@ -72,7 +72,7 @@ if (!empty($contactEmail)) {
                             <div class="marketing-showcase-frame">
                                 <aside class="marketing-ui-sidebar">
                                     <div class="marketing-ui-brand">
-                                        <img src="<?= e(url('/assets/images/peoplova-mark-white.svg')); ?>" alt="" style="height:.85rem;width:auto;opacity:.92;">
+                                        <img src="<?= e(url('/assets/images/Byblos HR-mark-white.svg')); ?>" alt="" style="height:.85rem;width:auto;opacity:.92;">
                                         <strong><?= e($productName); ?></strong>
                                     </div>
                                     <div class="marketing-ui-nav">
@@ -397,12 +397,13 @@ if (!empty($contactEmail)) {
     <div class="container d-flex flex-wrap align-items-center justify-content-between gap-3">
         <span class="text-muted" style="font-size:.88rem;">&copy; <?= e(date('Y')); ?> <?= e($productName); ?> &mdash; HR Operations Platform</span>
         <div class="d-flex align-items-center gap-3">
-            <a href="mailto:hello@peoplova.com" class="text-muted text-decoration-none" style="font-size:.88rem;">
-                <i class="bi bi-envelope me-1"></i>hello@peoplova.com
+            <a href="mailto:hello@Byblos HR.com" class="text-muted text-decoration-none" style="font-size:.88rem;">
+                <i class="bi bi-envelope me-1"></i>hello@Byblos HR.com
             </a>
-            <a href="https://linkedin.com/company/peoplova" target="_blank" rel="noopener noreferrer" class="text-muted text-decoration-none" style="font-size:.88rem;" aria-label="Peoplova on LinkedIn">
+            <a href="https://linkedin.com/company/Byblos HR" target="_blank" rel="noopener noreferrer" class="text-muted text-decoration-none" style="font-size:.88rem;" aria-label="Byblos HR on LinkedIn">
                 <i class="bi bi-linkedin me-1"></i>LinkedIn
             </a>
         </div>
     </div>
 </footer>
+

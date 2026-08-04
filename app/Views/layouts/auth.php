@@ -1,4 +1,4 @@
-<?php declare(strict_types=1); ?>
+﻿<?php declare(strict_types=1); ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -19,7 +19,7 @@
         <div class="auth-inner">
 
             <div class="auth-brand-mark">
-                <img src="<?= e(url('/assets/images/peoplova-mark-white.svg')); ?>"
+                <img src="<?= e(url('/assets/images/Byblos HR-mark-white.svg')); ?>"
                      alt="<?= e(\App\Support\Branding::name()); ?>"
                      class="auth-mark-img">
                 <span class="auth-mark-name"><?= e(\App\Support\Branding::name()); ?></span>
@@ -40,3 +40,4 @@
     <script src="<?= e(asset('js/bootstrap.bundle.min.js')); ?>"></script>
 </body>
 </html>
+

@@ -1,8 +1,8 @@
-<?php declare(strict_types=1);
+﻿<?php declare(strict_types=1);
 $canonicalUrl = rtrim(url('/'), '/') . '/';
-$ogImage      = url('/assets/images/peoplova-og.png');
+$ogImage      = url('/assets/images/Byblos HR-og.png');
 $pageTitle    = $title ?? (\App\Support\Branding::name() . ' — HR Operations Platform for People-Led Teams');
-$pageDesc     = $metaDescription ?? 'Peoplova is an implementation-led HR operations platform that centralises employee records, leave, documents, onboarding, offboarding, and recruitment into one structured workspace — delivered through a guided rollout. Built for GCC and Arab World organizations.';
+$pageDesc     = $metaDescription ?? 'Byblos HR is an implementation-led HR operations platform that centralises employee records, leave, documents, onboarding, offboarding, and recruitment into one structured workspace — delivered through a guided rollout. Built for GCC and Arab World organizations.';
 $pageKeywords = $metaKeywords ?? 'HR platform Qatar, HR software UAE, Gulf HR platform, HR system GCC, people operations, employee management system, leave management Gulf, HR onboarding software, HRIS Arabic, نظام موارد بشرية, HR software Middle East, workforce management Qatar';
 ?>
 <!doctype html>
@@ -59,11 +59,11 @@ $pageKeywords = $metaKeywords ?? 'HR platform Qatar, HR software UAE, Gulf HR pl
           "url": "<?= e($canonicalUrl); ?>",
           "logo": {
             "@type": "ImageObject",
-            "url": "<?= e(url('/assets/images/peoplova-mark.svg')); ?>",
+            "url": "<?= e(url('/assets/images/Byblos HR-mark.svg')); ?>",
             "width": 32,
             "height": 32
           },
-          "description": "Peoplova is an implementation-led HR operations platform that centralises employee lifecycle management, leave, documents, onboarding, offboarding, and recruitment into one structured workspace.",
+          "description": "Byblos HR is an implementation-led HR operations platform that centralises employee lifecycle management, leave, documents, onboarding, offboarding, and recruitment into one structured workspace.",
           "knowsAbout": ["Human Resources", "People Operations", "Employee Management", "HRIS", "Leave Management", "Workforce Management"]
         },
         {
@@ -101,50 +101,50 @@ $pageKeywords = $metaKeywords ?? 'HR platform Qatar, HR software UAE, Gulf HR pl
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "What is Peoplova?",
+              "name": "What is Byblos HR?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Peoplova is an HR operations platform built for HR leaders who need one structured system to manage employee records, leave approvals, documents, onboarding, offboarding, and recruitment. It is delivered through a guided implementation so the setup matches your organisation's structure and processes."
+                "text": "Byblos HR is an HR operations platform built for HR leaders who need one structured system to manage employee records, leave approvals, documents, onboarding, offboarding, and recruitment. It is delivered through a guided implementation so the setup matches your organisation's structure and processes."
               }
             },
             {
               "@type": "Question",
-              "name": "What HR modules does Peoplova include?",
+              "name": "What HR modules does Byblos HR include?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Peoplova includes modules for employee records and lifecycle tracking, leave requests and multi-level approvals, HR document management with expiry alerts, onboarding and offboarding workflows, a recruitment and careers portal, org chart visualisation, HR reporting, announcements, notifications, and payroll structure management."
+                "text": "Byblos HR includes modules for employee records and lifecycle tracking, leave requests and multi-level approvals, HR document management with expiry alerts, onboarding and offboarding workflows, a recruitment and careers portal, org chart visualisation, HR reporting, announcements, notifications, and payroll structure management."
               }
             },
             {
               "@type": "Question",
-              "name": "How is Peoplova implemented?",
+              "name": "How is Byblos HR implemented?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Peoplova is delivered through a guided rollout rather than a self-serve setup. The implementation is configured to match your organisation's structure, approval model, access permissions, and branding before handoff — reducing the gap between purchase and productive use."
+                "text": "Byblos HR is delivered through a guided rollout rather than a self-serve setup. The implementation is configured to match your organisation's structure, approval model, access permissions, and branding before handoff — reducing the gap between purchase and productive use."
               }
             },
             {
               "@type": "Question",
-              "name": "Who is Peoplova designed for?",
+              "name": "Who is Byblos HR designed for?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Peoplova is built for HR leaders and operations stakeholders at organisations that need better control over people workflows, compliance exposure, and decision visibility. It is particularly suited to teams currently managing HR across spreadsheets, email inboxes, and disconnected tools."
+                "text": "Byblos HR is built for HR leaders and operations stakeholders at organisations that need better control over people workflows, compliance exposure, and decision visibility. It is particularly suited to teams currently managing HR across spreadsheets, email inboxes, and disconnected tools."
               }
             },
             {
               "@type": "Question",
-              "name": "Does Peoplova support multiple departments and branches?",
+              "name": "Does Byblos HR support multiple departments and branches?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes. Peoplova supports multi-branch and multi-department org structures with role-based access control, allowing different permission levels for HR administrators, managers, and employees across locations."
+                "text": "Yes. Byblos HR supports multi-branch and multi-department org structures with role-based access control, allowing different permission levels for HR administrators, managers, and employees across locations."
               }
             },
             {
               "@type": "Question",
-              "name": "How do I get started with Peoplova?",
+              "name": "How do I get started with Byblos HR?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "To get started with Peoplova, use the contact form on the website to send an enquiry. The team will follow up to assess fit, discuss your structure, and outline a rollout approach tailored to your organisation."
+                "text": "To get started with Byblos HR, use the contact form on the website to send an enquiry. The team will follow up to assess fit, discuss your structure, and outline a rollout approach tailored to your organisation."
               }
             }
           ]
@@ -167,3 +167,4 @@ $pageKeywords = $metaKeywords ?? 'HR platform Qatar, HR software UAE, Gulf HR pl
     <script src="<?= e(asset('js/bootstrap.bundle.min.js')); ?>"></script>
 </body>
 </html>
+

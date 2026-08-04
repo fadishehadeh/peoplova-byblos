@@ -1,95 +1,107 @@
-# CLAUDE.md
+# CLAUDE.md - Byblos HR (Byblos Printing SAL)
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This is a client-specific fork of the Peoplova HR platform, customized for Byblos Printing SAL.
+
+## Upstream
+
+Forked from: https://github.com/fadishehadeh/peoplova
+
+To pull core bug fixes from the original:
+```bash
+git remote add upstream https://github.com/fadishehadeh/peoplova.git
+git fetch upstream
+git merge upstream/main
+```
+Never push to upstream. Only pull from it.
 
 ## What This Is
 
-A custom PHP MVC HR management system with two separate front-ends served from the same codebase:
-- **HR Portal** (`public-hr/` document root) — internal staff portal (hr.peoplova.com)
-- **Careers Portal** (`public-careers/` document root) — public job board (careers.peoplova.com)
+A custom PHP MVC HR management system. Two front-ends from the same codebase:
+- HR Portal (public-hr/ document root) - internal staff portal
+- Careers Portal (public-careers/ document root) - public job board
 
-Each has its own `index.php` entry point that sets `APP_URL` before bootstrapping the shared `app/`.
+## Client Info
 
-## Running the Application
+- Client: Byblos Printing SAL
+- Industry: Printing / Publishing
+- Location: Lebanon
+- Primary color: #5B8DB8 (steel blue)
+- Dark accent: #4A7BA6
+- Soft tint: #E8F0F7
+- Charcoal text: #333333
 
-Requires XAMPP (Apache + MySQL). No build step — assets are static files. Start Apache and MySQL, then navigate to `http://localhost/HR System/public-hr/` or `/public-careers/`.
+## Brand Assets
 
-## Tests
+Logo files live in public-hr/assets/images/:
+- byblos-logo.png - main color logo (used in sidebar and login)
+- byblos-logo-white.png - white version (used on dark backgrounds)
 
-```bash
-composer test          # PHPUnit via phpunit.xml
+To update the logo, replace these files. The sidebar references them via the settings table
+logo_url in the DB, or directly in app/Views/partials/sidebar.php.
+
+## Running Locally
+
+Requires XAMPP (Apache + MySQL). No build step.
+Start Apache + MySQL, navigate to http://localhost/byblos-hr/public-hr/
+
+Update DB app_url if routes return 404:
+```sql
+UPDATE settings SET setting_value = 'http://localhost/byblos-hr/public-hr' WHERE setting_key = 'app_url';
 ```
 
-## Cron Jobs (Required for Full Functionality)
+## Hosting (TBD)
+
+- Domain: TBD
+- Host: TBD (Namecheap shared hosting recommended)
+- Server IP: TBD
+- SSH: TBD
+- DB name: TBD
+- DB user: TBD
+
+Update this file when hosting is provisioned.
+
+## Deployment
+
+Same git push -> git pull workflow as peoplova.com.
 
 ```bash
-php scripts/process-email-queue.php    # Every minute — processes queued emails
-php scripts/process-escalations.php   # Periodic — escalation workflows
+git push origin main
+ssh -i ~/.ssh/byblos_deploy -p 21098 <user>@<server-ip> "cd /home/<user>/byblos-hr && git pull origin main"
+```
+
+## Environment (.env)
+
+Copy .env.example to .env. Key values:
+- DB_DATABASE - Byblos DB name
+- DB_USERNAME / DB_PASSWORD - Byblos DB credentials
+- ENCRYPTION_KEY - generate fresh 64-char hex (NEVER copy from peoplova)
+- APP_URL - the live domain once provisioned
+- MAIL_FROM_NAME - "Byblos HR"
+- MAIL_FROM_ADDRESS - noreply@<client-domain>
+
+CRITICAL: Generate a NEW ENCRYPTION_KEY for this client. Never reuse peoplova's key:
+```bash
+php -r "echo bin2hex(random_bytes(32));"
 ```
 
 ## Architecture
 
-### Request Lifecycle
+Identical to upstream Peoplova. See upstream repo CLAUDE.md for full architecture notes.
 
-```
-public-hr/index.php → bootstrap.php → Router → Middleware → Controller → View
-```
+Key differences from upstream:
+- Brand colors: blue (#5B8DB8) instead of red
+- App name: "Byblos HR" instead of "Peoplova HR"
+- Logo: Byblos Printing SAL logo
 
-- **Router** (`app/Core/Router.php`): Parses URI, matches against route files in `routes/`, runs middleware pipeline, dispatches to controller method.
-- **Route files** (`routes/`): Each module has its own file (`leaves.php`, `employees.php`, etc.). Syntax: `$router->get('/path/{param}', [Controller::class, 'method'], [Middleware::class])`.
-- **Controllers** (`app/Modules/*/Controllers/`): Extend `app/Core/Controller.php`, receive the `Application` instance via constructor.
-- **Views** (`app/Views/`): Plain PHP templates. Use `$this->render('path/to/view', $data)` from controllers.
+## Tests
 
-### Databases
-
-Two MySQL databases configured separately:
-- `hr_system` — main app (config via `config/database.php` and `.env`)
-- `hr_systemcareers` — careers portal (config via `config/careers_db.php`)
-
-Schema files: `database/hr_system_full.sql` (main) and `database/careers_migration.sql`. Run these plus any migration files in `database/` prefixed with dates when setting up.
-
-Database access uses `$app->database()` which returns a PDO wrapper. Always use prepared statements — no raw query interpolation.
-
-### Authentication & Permissions
-
-Session-based auth in `app/Core/Auth.php`. Login flow: verify password hash → regenerate session → cache user in session. Optional OTP path sends a code via Mailjet SMTP before completing login.
-
-RBAC: `roles` → `role_permissions` → `permissions` tables. The `PermissionMiddleware` checks `module_name.action_name` pairs. `RoleMiddleware` checks role codes directly.
-
-Lockout: 5 failed attempts → 15-minute lockout (configurable in `config/app.php` under `security`).
-
-### Encryption
-
-Sensitive PII fields are AES-256-CBC encrypted at rest. Use the global helpers `encrypt_field()` / `decrypt_field()` from `app/Support/Encryption.php`. The `ENCRYPTION_KEY` in `.env` must be a 64-character hex string. Never store plaintext PII in those columns.
-
-### Key Helpers (`app/Support/helpers.php`)
-
-Global functions available everywhere: `env()`, `config()`, `auth()`, `url()`, `flash()`, `csrf_field()`, `e()` (XSS escape). Use these rather than accessing superglobals directly.
-
-### Audit Logging
-
-Every controller has `$this->auditLog($action, $entityType, $entityId, $details)`. Call it on any data-mutating operation so the `audit_logs` table stays complete.
-
-### Module Layout
-
-Each module under `app/Modules/<Name>/` follows:
-```
-Controllers/
-Models/ (or Repositories/)
-Views/
+```bash
+composer test
 ```
 
-The `Structure` module handles the company/branch/department hierarchy that most other modules reference. `Admin` manages users, roles, and permissions.
+## Cron Jobs
 
-### Frontend
-
-Bootstrap 5, DataTables for grids, TCPDF for PDF generation, PhpSpreadsheet for Excel export. No npm/webpack — all libraries are included as static assets in `public-hr/assets/` and `public-careers/assets/`.
-
-## Environment Configuration
-
-Copy `.env.example` to `.env`. Critical values:
-- `DB_*` — database credentials for both databases
-- `ENCRYPTION_KEY` — 64-char hex, never change after data exists
-- `MAIL_*` — Mailjet SMTP for OTP and notifications
-- `APP_URL` — overridden per entry point, but set a sensible default
-- `RECAPTCHA_*` — Google reCAPTCHA for public-facing forms
+```bash
+php scripts/process-email-queue.php    # Every minute
+php scripts/process-escalations.php   # Periodic
+```
