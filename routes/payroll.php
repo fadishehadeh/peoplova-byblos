@@ -9,6 +9,7 @@ use App\Middleware\RoleMiddleware;
 use App\Modules\Payroll\PayrollController;
 use App\Modules\Payroll\OtGroupController;
 use App\Modules\Payroll\FuelPriceController;
+use App\Modules\Payroll\PayrollSettingsController;
 
 $router = $app->router();
 
@@ -36,5 +37,9 @@ $router->post('/payroll/ot-groups/{id}/edit',        [OtGroupController::class, 
 $router->post('/payroll/ot-groups/{id}/delete',      [OtGroupController::class, 'destroy'], [...$base, $hrRole]);
 
 // ── Fuel Prices ───────────────────────────────────────────────────────────────
-$router->get('/payroll/fuel-prices',   [FuelPriceController::class, 'index'], [...$base, $hrRole]);
+$router->get('/payroll/fuel-prices',       [FuelPriceController::class, 'index'], [...$base, $hrRole]);
 $router->post('/payroll/fuel-prices/save', [FuelPriceController::class, 'save'],  [...$base, $hrRole]);
+
+// ── Payroll Settings ──────────────────────────────────────────────────────────
+$router->get('/payroll/settings',       [PayrollSettingsController::class, 'index'], [...$base, $hrRole]);
+$router->post('/payroll/settings/save', [PayrollSettingsController::class, 'save'],  [...$base, $hrRole]);

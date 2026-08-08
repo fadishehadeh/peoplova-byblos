@@ -260,6 +260,7 @@ $userName    = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '
                         <a href="<?= e(url('/payroll/ot-groups')); ?>"         class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/ot-groups') ? ' active' : ''; ?>">OT Groups</a>
                         <a href="<?= e(url('/payroll/fuel-prices')); ?>"       class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/fuel-prices') ? ' active' : ''; ?>">Fuel Prices</a>
                         <a href="<?= e(url('/attendance/import')); ?>"         class="sidebar-sublink<?= str_starts_with($currentPath, '/attendance') ? ' active' : ''; ?>">Attendance Import</a>
+                        <a href="<?= e(url('/payroll/settings')); ?>"          class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/settings') ? ' active' : ''; ?>">Payroll Settings</a>
                     </div>
                 </div>
             </div>

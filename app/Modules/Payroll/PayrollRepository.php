@@ -303,8 +303,20 @@ final class PayrollRepository
         );
         $fuelPerTank = $fuelRow ? (float) $fuelRow['price_per_tank'] : 0.0;
 
-        // Working days in month: Mon–Sat (Lebanon 6-day week)
-        $workingDays = $this->countWorkingDays($month, $year);
+        // Load company payroll settings (with fallback defaults)
+        $settingsRows = $this->database->fetchAll(
+            'SELECT setting_key, setting_value FROM payroll_company_settings WHERE company_id = :cid',
+            ['cid' => $companyId]
+        );
+        $companySettings = [];
+        foreach ($settingsRows as $sr) { $companySettings[$sr['setting_key']] = $sr['setting_value']; }
+
+        $companyDamanRate = isset($companySettings['daman_rate'])      ? (float) $companySettings['daman_rate']      : 3.0;
+        $companyTaxRate   = isset($companySettings['income_tax_rate'])  ? (float) $companySettings['income_tax_rate']  : 2.0;
+        $workingWeek      = $companySettings['working_week'] ?? 'mon_sat';
+
+        // Working days in month per configured working week
+        $workingDays = $this->countWorkingDays($month, $year, $workingWeek);
 
         foreach ($structures as $s) {
             $employeeId = (int) $s['employee_id'];
@@ -344,9 +356,9 @@ final class PayrollRepository
             $transportDeductPerDay = $workingDays > 0 ? ($monthlyTransport / $workingDays) : 0.0;
             $transportAmount       = max(0.0, round($monthlyTransport - ($unpaidDays * $transportDeductPerDay), 2));
 
-            // Daman and income tax on basic salary
-            $damanRate  = isset($s['daman_rate'])     ? (float) $s['daman_rate']     : 3.0;
-            $taxRate    = isset($s['income_tax_rate']) ? (float) $s['income_tax_rate'] : 2.0;
+            // Daman and income tax — use company settings as authoritative source
+            $damanRate = $companyDamanRate;
+            $taxRate   = $companyTaxRate;
             $daman      = round($basic * $damanRate / 100, 2);
             $incomeTax  = round($basic * $taxRate   / 100, 2);
 
@@ -379,15 +391,17 @@ final class PayrollRepository
         }
     }
 
-    /** Count Mon–Sat days in the given month (Lebanon 6-day week) */
-    private function countWorkingDays(int $month, int $year): int
+    /** Count working days in the given month based on the configured working week. */
+    private function countWorkingDays(int $month, int $year, string $workingWeek = 'mon_sat'): int
     {
         $days  = 0;
         $total = (int) date('t', mktime(0, 0, 0, $month, 1, $year));
         for ($d = 1; $d <= $total; $d++) {
             $dow = (int) date('N', mktime(0, 0, 0, $month, $d, $year)); // 1=Mon … 7=Sun
-            if ($dow !== 7) { // exclude Sunday only
-                $days++;
+            if ($workingWeek === 'mon_fri') {
+                if ($dow <= 5) { $days++; } // Mon–Fri only
+            } else {
+                if ($dow !== 7) { $days++; } // Mon–Sat (default, Lebanon)
             }
         }
         return $days;
