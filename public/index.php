@@ -57,5 +57,6 @@ require BASE_PATH . '/routes/intake.php';
 require BASE_PATH . '/routes/api.php';
 require BASE_PATH . '/routes/resilience.php';
 require BASE_PATH . '/routes/payroll.php';
+require BASE_PATH . '/routes/attendance.php';
 
 $app->run();

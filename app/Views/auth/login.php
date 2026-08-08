@@ -28,6 +28,26 @@
         <p class="text-center text-muted mb-0" style="font-size:.775rem">
             <i class="bi bi-shield-lock me-1 text-success"></i>Secured with two-factor email verification.
         </p>
+
+        <?php if (!empty($devUsers)): ?>
+        <div class="mt-4 p-3 rounded" style="background:#fffbea;border:1px dashed #f0c040;">
+            <p class="fw-semibold mb-2 text-center" style="font-size:.78rem;color:#92690a;">
+                <i class="bi bi-bug me-1"></i>DEV — Quick Login
+            </p>
+            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                <?php foreach ($devUsers as $du): ?>
+                <form method="post" action="<?= e(url('/dev-login')); ?>">
+                    <?= csrf_field(); ?>
+                    <input type="hidden" name="user_id" value="<?= e((string)$du['id']); ?>">
+                    <button type="submit" class="btn btn-sm btn-warning" title="<?= e($du['email']); ?>">
+                        <?= e($du['username']); ?>
+                        <span class="badge bg-dark ms-1" style="font-size:.65rem;"><?= e($du['role_name'] ?? '—'); ?></span>
+                    </button>
+                </form>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 </div>
 <?php if (!empty($recaptchaSiteKey)): ?>

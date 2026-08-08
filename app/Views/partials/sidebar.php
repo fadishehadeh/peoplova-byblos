@@ -247,7 +247,7 @@ $userName    = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '
             <?php endif; ?>
 
             <?php if (is_payroll_enabled() && has_role(['super_admin', 'hr_only', 'hr_admin'])): ?>
-            <?php $payrollId = $nextId(); $payrollOpen = $groupOpen(['/payroll']); ?>
+            <?php $payrollId = $nextId(); $payrollOpen = $groupOpen(['/payroll', '/attendance']); ?>
             <div class="sidebar-group">
                 <a class="sidebar-group-toggle<?= $payrollOpen ? '' : ' collapsed'; ?>" href="#<?= e($payrollId); ?>" data-bs-toggle="collapse" aria-expanded="<?= $payrollOpen ? 'true' : 'false'; ?>">
                     <i class="bi bi-cash-stack"></i> Payroll
@@ -257,6 +257,9 @@ $userName    = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '
                     <div class="sidebar-collapse-body">
                         <a href="<?= e(url('/payroll/salary-structures')); ?>" class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/salary') ? ' active' : ''; ?>">Salary Structures</a>
                         <a href="<?= e(url('/payroll/runs')); ?>"              class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/runs') ? ' active' : ''; ?>">Payroll Runs</a>
+                        <a href="<?= e(url('/payroll/ot-groups')); ?>"         class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/ot-groups') ? ' active' : ''; ?>">OT Groups</a>
+                        <a href="<?= e(url('/payroll/fuel-prices')); ?>"       class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/fuel-prices') ? ' active' : ''; ?>">Fuel Prices</a>
+                        <a href="<?= e(url('/attendance/import')); ?>"         class="sidebar-sublink<?= str_starts_with($currentPath, '/attendance') ? ' active' : ''; ?>">Attendance Import</a>
                     </div>
                 </div>
             </div>

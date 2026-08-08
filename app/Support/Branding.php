@@ -97,15 +97,15 @@ final class Branding
             }
         }
 
-        return url('/assets/images/peoplova-mark-white.svg');
+        return url('/assets/images/byblos-mark-white.svg');
     }
 
-    /** Hex brand colour, e.g. "#FF3D33", or the default if not configured. */
+    /** Hex brand colour, e.g. "#5B8DB8", or the default if not configured. */
     public static function brandColor(): string
     {
         $v = self::tenant()['brand_color'] ?? null;
 
-        return ($v !== null && $v !== '') ? (string) $v : '#ff3d33';
+        return ($v !== null && $v !== '') ? (string) $v : '#5B8DB8';
     }
 
     // ------------------------------------------------------------------
@@ -119,12 +119,12 @@ final class Branding
 
     public static function defaultLogoUrl(): string
     {
-        return url('/assets/images/peoplova-mark.svg');
+        return url('/assets/images/byblos-logo.svg');
     }
 
     public static function defaultLogoPath(): ?string
     {
-        $path = base_path('public-hr/assets/images/peoplova-mark.svg');
+        $path = base_path('public-hr/assets/images/byblos-logo.svg');
 
         return is_file($path) ? $path : null;
     }

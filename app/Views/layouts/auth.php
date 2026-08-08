@@ -1,4 +1,4 @@
-﻿<?php declare(strict_types=1); ?>
+<?php declare(strict_types=1); ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -9,7 +9,7 @@
     <link href="<?= e(asset('css/bootstrap.min.css')); ?>" rel="stylesheet">
     <link href="<?= e(asset('css/bootstrap-icons.min.css')); ?>" rel="stylesheet">
     <link href="<?= e(asset('css/app.css')); ?>" rel="stylesheet">
-    <?php $__bc = \App\Support\Branding::brandColor(); if ($__bc !== '' && $__bc !== '#ff3d33'): ?>
+    <?php $__bc = \App\Support\Branding::brandColor(); if ($__bc !== '' && $__bc !== '#5B8DB8'): ?>
     <style>:root { --brand-primary: <?= e($__bc); ?>; }</style>
     <?php endif; ?>
 </head>
@@ -19,7 +19,7 @@
         <div class="auth-inner">
 
             <div class="auth-brand-mark">
-                <img src="<?= e(url('/assets/images/Byblos HR-mark-white.svg')); ?>"
+                <img src="<?= e(\App\Support\Branding::logoWhiteUrl()); ?>"
                      alt="<?= e(\App\Support\Branding::name()); ?>"
                      class="auth-mark-img">
                 <span class="auth-mark-name"><?= e(\App\Support\Branding::name()); ?></span>

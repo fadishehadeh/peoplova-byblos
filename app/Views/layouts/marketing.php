@@ -1,4 +1,4 @@
-﻿<?php declare(strict_types=1);
+<?php declare(strict_types=1);
 $canonicalUrl = rtrim(url('/'), '/') . '/';
 $ogImage      = url('/assets/images/Byblos HR-og.png');
 $pageTitle    = $title ?? (\App\Support\Branding::name() . ' — HR Operations Platform for People-Led Teams');

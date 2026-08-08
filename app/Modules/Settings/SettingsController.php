@@ -427,33 +427,6 @@ final class SettingsController extends Controller
         $redirectPath = '/settings/system';
         $this->validateCsrf($request, $redirectPath);
 
-        $tenant = $this->repository->getMainTenant();
-
-        if ($tenant === null) {
-            $this->app->session()->flash('error', 'Main tenant record not found. Run the branding migration first.');
-            $this->redirect($redirectPath);
-        }
-
-        $tenantId  = (int) $tenant['id'];
-        $name      = trim((string) $request->input('name', ''));
-        $tagline   = trim((string) $request->input('tagline', ''));
-        $color     = trim((string) $request->input('brand_color', ''));
-
-        if ($name === '') {
-            $this->app->session()->flash('error', 'Organisation name is required.');
-            $this->redirect($redirectPath);
-        }
-
-        if (strlen($name) > 150) {
-            $this->app->session()->flash('error', 'Organisation name must be 150 characters or fewer.');
-            $this->redirect($redirectPath);
-        }
-
-        if ($color !== '' && !preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
-            $this->app->session()->flash('error', 'Brand colour must be a valid 6-digit hex code (e.g. #FF3D33).');
-            $this->redirect($redirectPath);
-        }
-
         $this->repository->ensureOperationalSettingsSeeded();
         $existingOperationalRows = $this->repository->operationalSettings();
         $operationalPayload = $request->input('settings', []);
@@ -469,49 +442,6 @@ final class SettingsController extends Controller
             $this->redirect($redirectPath);
         }
 
-        $allowedExt  = ['png', 'jpg', 'jpeg', 'svg', 'gif'];
-        $maxBytes    = 2 * 1024 * 1024;
-        $logoDir     = base_path('public-hr/assets/uploads/logos');
-
-        $logoPath      = $tenant['logo_path']       !== '' ? $tenant['logo_path']       : null;
-        $logoPathWhite = $tenant['logo_path_white'] !== '' ? $tenant['logo_path_white'] : null;
-
-        foreach ([
-            ['field' => 'logo_file',       'key' => 'main_tenant',       'outVar' => &$logoPath],
-            ['field' => 'logo_file_white', 'key' => 'main_tenant_white', 'outVar' => &$logoPathWhite],
-        ] as $upload) {
-            $file = $request->file($upload['field']);
-            if (!is_array($file) || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-                continue;
-            }
-
-            $ext = strtolower(pathinfo(basename((string) ($file['name'] ?? '')), PATHINFO_EXTENSION));
-
-            if (!in_array($ext, $allowedExt, true)) {
-                $this->app->session()->flash('error', 'Logo must be PNG, JPG, SVG, or GIF.');
-                $this->redirect($redirectPath);
-            }
-
-            if ((int) ($file['size'] ?? 0) > $maxBytes) {
-                $this->app->session()->flash('error', 'Logo file must be 2 MB or smaller.');
-                $this->redirect($redirectPath);
-            }
-
-            if (!is_dir($logoDir) && !mkdir($logoDir, 0775, true) && !is_dir($logoDir)) {
-                throw new \RuntimeException('Unable to create logo upload directory.');
-            }
-
-            $storedName = $upload['key'] . '_' . date('YmdHis') . '.' . $ext;
-            $storedPath = 'assets/uploads/logos/' . $storedName;
-
-            if (!move_uploaded_file((string) ($file['tmp_name'] ?? ''), base_path('public-hr/' . $storedPath))) {
-                $this->app->session()->flash('error', 'Unable to save uploaded logo file.');
-                $this->redirect($redirectPath);
-            }
-
-            $upload['outVar'] = $storedPath;
-        }
-
         try {
             $actorId = (int) $this->app->auth()->id();
             $requestIp = (string) ($request->ip() ?? '');
@@ -519,26 +449,10 @@ final class SettingsController extends Controller
 
             $payrollEnabled = $request->input('payroll_enabled') === '1';
             $this->app->database()->transaction(function () use (
-                $tenantId,
-                $name,
-                $tagline,
-                $logoPath,
-                $logoPathWhite,
-                $color,
                 $payrollEnabled,
                 $actorId,
                 $normalizedOperational
             ): void {
-                $this->repository->saveMainTenant(
-                    $tenantId,
-                    $name,
-                    $tagline === '' ? null : $tagline,
-                    $logoPath,
-                    $logoPathWhite,
-                    $color === '' ? null : $color,
-                    $actorId
-                );
-
                 $this->repository->setPayrollEnabled($payrollEnabled, $actorId);
 
                 foreach ($normalizedOperational as $field) {
@@ -556,7 +470,6 @@ final class SettingsController extends Controller
                 }
             });
 
-            \App\Support\Branding::clearCache();
             $this->auditLog(
                 'settings',
                 'system_settings',
@@ -566,11 +479,6 @@ final class SettingsController extends Controller
                 $userAgent,
                 null,
                 [
-                    'branding' => [
-                        'name' => $name,
-                        'tagline' => $tagline === '' ? null : $tagline,
-                        'brand_color' => $color === '' ? null : $color,
-                    ],
                     'payroll_enabled' => $payrollEnabled,
                     'operational_changed_fields' => array_values(array_map(
                         static fn (array $field): string => (string) $field['definition']['label'],

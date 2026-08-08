@@ -46,6 +46,38 @@
                 </div>
             </div></div>
 
+            <?php if (!empty($options['ot_groups']) || isset($employee['ot_group_id'])): ?>
+            <div class="card content-card mt-4"><div class="card-body p-4">
+                <div class="form-section-title">Payroll Settings</div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">OT Group</label>
+                        <select name="ot_group_id" class="form-select">
+                            <option value="">No OT / Not applicable</option>
+                            <?php foreach (($options['ot_groups'] ?? []) as $og): ?>
+                            <option value="<?= e((string) $og['id']); ?>"
+                                <?= (string) old('ot_group_id', $employee['ot_group_id'] ?? '') === (string) $og['id'] ? 'selected' : ''; ?>>
+                                <?= e((string) $og['name']); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="form-text">Determines overtime rate and blocks for this employee.</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Transport Tanks</label>
+                        <select name="transport_tanks" class="form-select">
+                            <?php for ($t = 0; $t <= 6; $t++): ?>
+                            <option value="<?= $t; ?>" <?= (int) old('transport_tanks', $employee['transport_tanks'] ?? 0) === $t ? 'selected' : ''; ?>>
+                                <?= $t; ?> tank<?= $t !== 1 ? 's' : ''; ?><?= $t === 0 ? ' (no transport)' : ''; ?>
+                            </option>
+                            <?php endfor; ?>
+                        </select>
+                        <div class="form-text">Number of fuel tanks allocated per month.</div>
+                    </div>
+                </div>
+            </div></div>
+            <?php endif; ?>
+
             <div class="card content-card mt-4"><div class="card-body p-4">
                 <div class="form-section-title">Emergency Contacts</div>
                 <div id="ec-wrapper">

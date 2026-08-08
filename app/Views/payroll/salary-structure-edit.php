@@ -68,10 +68,30 @@
                 </div>
 
                 <div class="col-12 col-md-4">
+                    <label class="form-label fw-semibold">Daman Rate (%)</label>
+                    <div class="input-group">
+                        <input type="number" name="daman_rate" class="form-control" step="0.01" min="0" max="100"
+                               value="<?= e((string) ($current['daman_rate'] ?? '3.00')); ?>">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <div class="form-text">Deducted from basic salary. Default: 3%.</div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label class="form-label fw-semibold">Income Tax Rate (%)</label>
+                    <div class="input-group">
+                        <input type="number" name="income_tax_rate" class="form-control" step="0.01" min="0" max="100"
+                               value="<?= e((string) ($current['income_tax_rate'] ?? '2.00')); ?>">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <div class="form-text">Deducted from basic salary. Default: 2%.</div>
+                </div>
+
+                <div class="col-12 col-md-4">
                     <label class="form-label fw-semibold required-label">Currency</label>
                     <select name="currency" class="form-select">
-                        <?php foreach (['QAR', 'USD', 'EUR', 'GBP', 'AED', 'SAR', 'KWD', 'BHD', 'OMR', 'JOD'] as $cur): ?>
-                        <option value="<?= e($cur); ?>" <?= ($current['currency'] ?? 'QAR') === $cur ? 'selected' : ''; ?>>
+                        <?php foreach (['USD', 'QAR', 'EUR', 'GBP', 'AED', 'SAR', 'KWD', 'BHD', 'OMR', 'JOD'] as $cur): ?>
+                        <option value="<?= e($cur); ?>" <?= ($current['currency'] ?? 'USD') === $cur ? 'selected' : ''; ?>>
                             <?= e($cur); ?>
                         </option>
                         <?php endforeach; ?>

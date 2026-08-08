@@ -28,11 +28,49 @@ final class AuthController extends Controller
 
     public function showLogin(Request $request): void
     {
+        $devUsers = null;
+        if ((bool) env('APP_DEBUG', false)) {
+            $devUsers = $this->app->database()->fetchAll(
+                'SELECT u.id, u.username, u.email, r.name AS role_name
+                 FROM users u
+                 LEFT JOIN roles r ON r.id = u.role_id
+                 WHERE u.status = :status
+                 ORDER BY r.name, u.username',
+                ['status' => 'active']
+            );
+        }
+
         $this->render('auth.login', [
-            'title'          => 'Login',
-            'pageTitle'      => 'Sign in to your account',
+            'title'            => 'Login',
+            'pageTitle'        => 'Sign in to your account',
             'recaptchaSiteKey' => $this->recaptchaSiteKey(),
+            'devUsers'         => $devUsers,
         ], 'auth');
+    }
+
+    public function devLogin(Request $request): void
+    {
+        if (!(bool) env('APP_DEBUG', false)) {
+            $this->app->session()->flash('error', 'Not available.');
+            $this->redirect('/login');
+        }
+
+        if (!$this->app->csrf()->validate((string) $request->input('_token'))) {
+            $this->app->session()->flash('error', 'Invalid token.');
+            $this->redirect('/login');
+        }
+
+        $userId = (int) $request->input('user_id');
+        if ($userId <= 0) {
+            $this->redirect('/login');
+        }
+
+        if (!$this->app->auth()->loginById($userId)) {
+            $this->app->session()->flash('error', 'Dev login failed.');
+            $this->redirect('/login');
+        }
+
+        $this->redirect('/dashboard');
     }
 
     public function login(Request $request): void

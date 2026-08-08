@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 declare(strict_types=1);
 
@@ -20,9 +20,9 @@ require BASE_PATH . '/vendor/autoload.php';
     putenv('APP_URL=' . $url);
 })();
 
-$_ENV['SESSION_NAME']    = 'Byblos HR_session';
-$_SERVER['SESSION_NAME'] = 'Byblos HR_session';
-putenv('SESSION_NAME=Byblos HR_session');
+$_ENV['SESSION_NAME']    = 'ByblosHR_session';
+$_SERVER['SESSION_NAME'] = 'ByblosHR_session';
+putenv('SESSION_NAME=ByblosHR_session');
 
 spl_autoload_register(static function (string $class): void {
     $prefix = 'App\\';
@@ -57,6 +57,9 @@ require BASE_PATH . '/routes/letters.php';
 require BASE_PATH . '/routes/jobs.php';
 require BASE_PATH . '/routes/intake.php';
 require BASE_PATH . '/routes/api.php';
+require BASE_PATH . '/routes/resilience.php';
+require BASE_PATH . '/routes/payroll.php';
+require BASE_PATH . '/routes/attendance.php';
 
 $app->run();
 

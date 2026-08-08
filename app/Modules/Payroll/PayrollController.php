@@ -90,7 +90,9 @@ final class PayrollController extends Controller
             'housing_allowance'   => $request->input('housing_allowance', ''),
             'transport_allowance' => $request->input('transport_allowance', ''),
             'other_allowances'    => $request->input('other_allowances', ''),
-            'currency'            => trim((string) $request->input('currency', 'QAR')),
+            'daman_rate'          => $request->input('daman_rate', '3.00'),
+            'income_tax_rate'     => $request->input('income_tax_rate', '2.00'),
+            'currency'            => trim((string) $request->input('currency', 'USD')),
             'effective_from'      => trim((string) $request->input('effective_from', '')),
         ];
 

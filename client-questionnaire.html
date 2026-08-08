@@ -1,0 +1,1016 @@
+<meta charset="utf-8">
+<title>Byblos HR — Client Setup Questionnaire</title>
+<style>
+:root {
+  --p:#5B8DB8; --pd:#4A7BA6; --pt:#E8F0F7; --ptd:#C8DFF0;
+  --bg:#F3F7FA; --card:#FFFFFF; --txt:#1B2C3A; --muted:#5D6F7D;
+  --border:#C8D8E8; --radius:8px; --shadow:0 1px 8px rgba(91,141,184,.10);
+}
+@media(prefers-color-scheme:dark){
+  :root{ --bg:#0E1B26;--card:#152030;--txt:#DCE8F2;--muted:#7FA8C4;--border:#253648;--pt:#1B3045;--ptd:#243A50;--shadow:0 1px 8px rgba(0,0,0,.35); }
+}
+:root[data-theme="dark"] { --bg:#0E1B26;--card:#152030;--txt:#DCE8F2;--muted:#7FA8C4;--border:#253648;--pt:#1B3045;--ptd:#243A50;--shadow:0 1px 8px rgba(0,0,0,.35); }
+:root[data-theme="light"]{ --bg:#F3F7FA;--card:#FFFFFF;--txt:#1B2C3A;--muted:#5D6F7D;--border:#C8D8E8;--pt:#E8F0F7;--ptd:#C8DFF0;--shadow:0 1px 8px rgba(91,141,184,.10); }
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.65;min-height:100vh}
+
+.hdr{background:var(--p);padding:30px 20px;text-align:center;color:#fff}
+.hdr-eye{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;opacity:.7;margin-bottom:6px}
+.hdr h1{font-size:1.45rem;font-weight:700;margin-bottom:4px}
+.hdr-sub{font-size:.88rem;opacity:.8;max-width:480px;margin:0 auto}
+
+.prog-bar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 20px;position:sticky;top:0;z-index:20;box-shadow:var(--shadow)}
+.prog-meta{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:8px}
+.prog-name{font-weight:600;color:var(--txt)}
+.prog-count{color:var(--muted)}
+.prog-track{background:var(--border);border-radius:99px;height:4px}
+.prog-fill{background:var(--p);height:4px;border-radius:99px;transition:width .35s ease}
+
+.wrap{max-width:680px;margin:0 auto;padding:28px 16px 80px}
+.skip-note{font-size:.78rem;color:var(--muted);font-style:italic;margin-bottom:20px}
+
+.step{display:none}
+.step.on{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.step-eye{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--p);font-weight:600;margin-bottom:4px}
+.step-head{font-size:1.3rem;font-weight:700;margin-bottom:4px;text-wrap:balance}
+.step-desc{font-size:.88rem;color:var(--muted);margin-bottom:22px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card.accent{background:var(--pt);border-color:var(--p)}
+
+.field{margin-bottom:20px}
+.field:last-child{margin-bottom:0}
+label.lbl{display:block;font-size:.86rem;font-weight:600;margin-bottom:6px}
+.hint{font-size:.76rem;color:var(--muted);margin-top:4px}
+
+input[type=text],input[type=number],select,textarea{
+  width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);
+  background:var(--bg);color:var(--txt);font-family:inherit;font-size:.88rem;
+  transition:border-color .18s,box-shadow .18s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(91,141,184,.14)}
+textarea{resize:vertical;min-height:70px}
+select{cursor:pointer}
+
+/* ── COMMENT FIELDS ── */
+.comment-wrap{margin-top:8px}
+.comment-lbl{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;display:block}
+.comment-tx{
+  font-size:.81rem;min-height:46px;border-style:dashed;border-color:var(--border);
+  background:transparent;color:var(--txt);opacity:.8;transition:opacity .15s,border-color .18s}
+.comment-tx:focus{opacity:1;border-style:solid;border-color:var(--p)}
+.comment-tx::placeholder{color:var(--muted);opacity:.7}
+
+.rg,.cg{display:flex;flex-direction:column;gap:7px}
+.ro,.co{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;background:var(--bg);transition:border-color .15s,background .15s}
+.ro:hover,.co:hover{border-color:var(--p);background:var(--pt)}
+.ro.on,.co.on{border-color:var(--p);background:var(--pt)}
+.ro input,.co input{margin-top:2px;accent-color:var(--p);flex-shrink:0;width:auto}
+.ol{font-size:.86rem;font-weight:500}
+.od{font-size:.76rem;color:var(--muted);margin-top:1px}
+
+hr.dv{border:none;border-top:1px solid var(--border);margin:18px 0}
+
+.cond{display:none;margin-top:10px;padding-left:18px;border-left:2px solid var(--ptd)}
+.cond.on{display:block}
+
+/* NEW — question badge */
+.new-badge{display:inline-block;font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--p);color:#fff;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+
+.nav{display:flex;align-items:center;gap:10px;margin-top:24px}
+.btn{padding:11px 22px;border:none;border-radius:var(--radius);font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-pri{background:var(--p);color:#fff}
+.btn-pri:hover{background:var(--pd);box-shadow:0 3px 10px rgba(91,141,184,.3)}
+.btn-sec{background:transparent;color:var(--muted);border:1.5px solid var(--border)}
+.btn-sec:hover{border-color:var(--p);color:var(--p)}
+.btn-grn{background:#2D9E6B;color:#fff}
+.btn-grn:hover{background:#24855A}
+.nav-spacer{flex:1}
+
+.done{display:none;text-align:center;padding:36px 0}
+.done.on{display:block}
+.done-icon{width:68px;height:68px;background:var(--pt);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.8rem;color:var(--p);border:2px solid var(--ptd)}
+.done h2{font-size:1.4rem;font-weight:700;margin-bottom:6px}
+.done p{font-size:.88rem;color:var(--muted);max-width:420px;margin:0 auto 16px}
+.summary-box{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:16px 18px;text-align:left;font-size:.78rem;line-height:1.7;white-space:pre-wrap;max-height:380px;overflow-y:auto;margin:16px 0;font-family:'Courier New',monospace;color:var(--txt)}
+.btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.email-note{font-size:.76rem;color:var(--muted);margin-top:12px}
+
+@media(max-width:480px){.wrap{padding:16px 10px 60px}.card{padding:16px}}
+</style>
+
+<header class="hdr">
+  <div class="hdr-eye">Byblos Printing SAL</div>
+  <h1>HR System Setup Questionnaire</h1>
+  <p class="hdr-sub">Please fill in as much as you can. Use the comments box under each question for anything that doesn't fit the provided options.</p>
+</header>
+
+<div class="prog-bar" id="progBar">
+  <div class="prog-meta">
+    <span class="prog-name" id="progName">Company &amp; Contacts</span>
+    <span class="prog-count" id="progCount">Step 1 of 10</span>
+  </div>
+  <div class="prog-track"><div class="prog-fill" id="progFill" style="width:10%"></div></div>
+</div>
+
+<div class="wrap">
+  <p class="skip-note">All fields are optional — answer what you know and use the comments boxes for anything else.</p>
+
+  <form id="frm">
+
+  <!-- ══ STEP 1 ══ -->
+  <div class="step on" data-step="1">
+    <div class="step-eye">Section 1 of 10</div>
+    <h2 class="step-head">Company &amp; Contacts</h2>
+    <p class="step-desc">Basic structure so we can set up the correct departments and admin accounts.</p>
+    <div class="card">
+
+      <div class="field">
+        <label class="lbl">Total number of employees</label>
+        <input type="number" name="emp_count" min="1" placeholder="e.g. 45">
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="emp_count_c" class="comment-tx" placeholder="Any notes, e.g. seasonal staff, part-time employees…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Department names</label>
+        <textarea name="depts" placeholder="e.g. Production, Sales, Accounting, Administration, Maintenance…"></textarea>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="depts_c" class="comment-tx" placeholder="Any sub-departments or teams to note…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Who will use this system? (name and role for each person)</label>
+        <textarea name="contacts" placeholder="e.g. Rania Khoury — HR Manager, George Abi Nader — Accountant…"></textarea>
+        <div class="hint">These people will receive admin access.</div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="contacts_c" class="comment-tx" placeholder="Any access restrictions or special roles to note…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Payday each month</label>
+        <select name="payday">
+          <option value="">— Select —</option>
+          <option>Last working day of the month</option>
+          <option>25th of the month</option>
+          <option>28th of the month</option>
+          <option>30th of the month</option>
+          <option>1st of the following month</option>
+          <option>Other</option>
+        </select>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="payday_c" class="comment-tx" placeholder="e.g. Different departments paid on different dates…"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ STEP 2 ══ -->
+  <div class="step" data-step="2">
+    <div class="step-eye">Section 2 of 10</div>
+    <h2 class="step-head">Work Schedule</h2>
+    <p class="step-desc">How the working week and daily shifts are structured.</p>
+    <div class="card">
+
+      <div class="field">
+        <label class="lbl">Days per week</label>
+        <div class="rg" data-n="work_days">
+          <label class="ro"><input type="radio" name="work_days" value="5 days — Monday to Friday"><div><div class="ol">5 days — Monday to Friday</div></div></label>
+          <label class="ro"><input type="radio" name="work_days" value="6 days — Monday to Saturday"><div><div class="ol">6 days — Monday to Saturday</div></div></label>
+          <label class="ro"><input type="radio" name="work_days" value="Varies by department"><div><div class="ol">Varies by department</div></div></label>
+        </div>
+        <div class="cond" id="c_workdays_vary"><textarea name="work_days_detail" placeholder="Which departments work which schedule?"></textarea></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="work_days_c" class="comment-tx" placeholder="Any exceptions, flexible arrangements…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Which shifts are currently in use? For each, list the time range and which department uses it.</label>
+        <textarea name="active_shifts" rows="5" placeholder="e.g.&#10;08:00–17:30 → Office &amp; Admin&#10;07:30–18:30 → Production Day Shift&#10;16:30–01:00 → Production Night Shift&#10;14:00–01:00 → Maintenance"></textarea>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="active_shifts_c" class="comment-tx" placeholder="Anything else about the shift structure…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Night shift — you mentioned 2 night shifts for printers. <span class="new-badge">New</span></label>
+        <div class="rg" data-n="night_shifts_type">
+          <label class="ro"><input type="radio" name="night_shifts_type" value="2 groups rotating the same 4:30 PM–1:00 AM window"><div><div class="ol">2 groups of printers rotating the same 4:30 PM – 1:00 AM window</div><div class="od">One group works one week, the other the next</div></div></label>
+          <label class="ro"><input type="radio" name="night_shifts_type" value="2 different time windows"><div><div class="ol">2 different time windows (different start/end times)</div></div></label>
+          <label class="ro"><input type="radio" name="night_shifts_type" value="Other arrangement"><div><div class="ol">Other arrangement</div></div></label>
+        </div>
+        <div class="cond" id="c_night_shifts_other"><textarea name="night_shifts_other_detail" placeholder="Describe the two night shifts…"></textarea></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="night_shifts_c" class="comment-tx" placeholder="e.g. Rotation frequency, who decides the rotation schedule…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Do night-shift employees receive a night-shift premium?</label>
+        <div class="rg" data-n="night_prem">
+          <label class="ro"><input type="radio" name="night_prem" value="Yes"><div><div class="ol">Yes</div></div></label>
+          <label class="ro"><input type="radio" name="night_prem" value="No — same rate as day shifts"><div><div class="ol">No — same rate as day shifts</div></div></label>
+        </div>
+        <div class="cond" id="c_night_prem"><input type="text" name="night_prem_rate" placeholder="Premium amount or percentage, e.g. +25% on basic or flat $50/month"></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="night_prem_c" class="comment-tx" placeholder="Any conditions or exceptions for the premium…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Lebanese public holidays</label>
+        <div class="rg" data-n="pub_hol">
+          <label class="ro"><input type="radio" name="pub_hol" value="All official holidays — employees do not work, full pay"><div><div class="ol">All official Lebanese public holidays — employees do not work, full pay</div></div></label>
+          <label class="ro"><input type="radio" name="pub_hol" value="Employees may work on holidays and receive holiday/overtime pay"><div><div class="ol">Employees may work on holidays and receive holiday/overtime pay</div></div></label>
+          <label class="ro"><input type="radio" name="pub_hol" value="Varies by department"><div><div class="ol">Varies by department</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="pub_hol_c" class="comment-tx" placeholder="Which departments continue working on holidays, special arrangements…"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ STEP 3 ══ -->
+  <div class="step" data-step="3">
+    <div class="step-eye">Section 3 of 10</div>
+    <h2 class="step-head">Time &amp; Attendance Machine</h2>
+    <p class="step-desc">We will connect the HR system to your punch machine to replace the manual Excel process.</p>
+    <div class="card">
+
+      <div class="field">
+        <label class="lbl">Punch machine brand and model</label>
+        <input type="text" name="machine_model" placeholder="e.g. ZKTeco K40, ZKTeco MB360 — check the label on the device">
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="machine_model_c" class="comment-tx" placeholder="Any details about the device, age, connectivity issues…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">What software does the attendance machine currently use to export data? <span class="new-badge">New</span></label>
+        <div class="rg" data-n="att_software">
+          <label class="ro"><input type="radio" name="att_software" value="ZKTeco BioTime (web-based management software)"><div><div class="ol">ZKTeco BioTime</div><div class="od">Web-based management software installed on a server</div></div></label>
+          <label class="ro"><input type="radio" name="att_software" value="ZKTeco ZKTime (desktop software)"><div><div class="ol">ZKTeco ZKTime</div><div class="od">Desktop software installed on a PC</div></div></label>
+          <label class="ro"><input type="radio" name="att_software" value="Raw export directly from the device (no software)"><div><div class="ol">Raw export directly from the device — no software</div></div></label>
+          <label class="ro"><input type="radio" name="att_software" value="Other software"><div><div class="ol">Other software</div></div></label>
+        </div>
+        <div class="cond" id="c_att_software_other"><input type="text" name="att_software_name" placeholder="Software name and version if known"></div>
+        <div class="hint">This determines whether we connect directly via API or import the Excel file you currently export.</div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="att_software_c" class="comment-tx" placeholder="e.g. The export file format, how often data is exported, who does it…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Number of machines and their locations</label>
+        <input type="number" name="machine_count" placeholder="Number of machines" min="1" style="margin-bottom:8px">
+        <textarea name="machine_locations" placeholder="e.g. Main entrance, warehouse, admin building…"></textarea>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="machine_locations_c" class="comment-tx" placeholder="Any machines that are offline or not used…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Grace period before a late arrival is recorded</label>
+        <select name="grace_period">
+          <option value="">— Select —</option>
+          <option>No grace period — exact shift start time</option>
+          <option>5 minutes</option>
+          <option>10 minutes</option>
+          <option>15 minutes</option>
+          <option>20 minutes</option>
+          <option>30 minutes</option>
+        </select>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="grace_period_c" class="comment-tx" placeholder="Different grace periods for different shifts or departments…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">If an employee arrives late, how is it handled?</label>
+        <div class="rg" data-n="late_rule">
+          <label class="ro"><input type="radio" name="late_rule" value="Salary deduction proportional to time late"><div><div class="ol">Salary deduction proportional to minutes late</div></div></label>
+          <label class="ro"><input type="radio" name="late_rule" value="Counted as half-day absence after a threshold"><div><div class="ol">Counted as half-day absence after a threshold</div></div></label>
+          <label class="ro"><input type="radio" name="late_rule" value="Warning only — no salary deduction"><div><div class="ol">Warning only — no salary deduction</div></div></label>
+          <label class="ro"><input type="radio" name="late_rule" value="Custom policy"><div><div class="ol">Custom policy</div></div></label>
+        </div>
+        <div class="cond" id="c_late_custom"><textarea name="late_custom" placeholder="Describe the policy…"></textarea></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="late_rule_c" class="comment-tx" placeholder="e.g. First offence is a warning, repeated lateness triggers deduction…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">If an employee leaves early, how is it handled?</label>
+        <div class="rg" data-n="early_rule">
+          <label class="ro"><input type="radio" name="early_rule" value="Same as late arrival — deducted from salary"><div><div class="ol">Same as late arrival — deducted from salary</div></div></label>
+          <label class="ro"><input type="radio" name="early_rule" value="Half-day absence"><div><div class="ol">Counted as half-day absence</div></div></label>
+          <label class="ro"><input type="radio" name="early_rule" value="Warning only"><div><div class="ol">Warning only</div></div></label>
+          <label class="ro"><input type="radio" name="early_rule" value="Custom policy"><div><div class="ol">Custom policy</div></div></label>
+        </div>
+        <div class="cond" id="c_early_custom"><textarea name="early_custom" placeholder="Describe the policy…"></textarea></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="early_rule_c" class="comment-tx" placeholder="Any exceptions for medical or emergency departures…"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ STEP 4 ══ -->
+  <div class="step" data-step="4">
+    <div class="step-eye">Section 4 of 10</div>
+    <h2 class="step-head">Overtime Rules</h2>
+    <p class="step-desc">How overtime is measured and paid. You mentioned there are 3 overtime groups and that OT is paid in 1.5-hour blocks.</p>
+    <div class="card">
+
+      <div class="field">
+        <label class="lbl">The 3 overtime groups — what is the difference between Group 1 and Group 2? <span class="new-badge">New</span></label>
+        <p class="hint" style="margin-bottom:8px">Both groups start overtime at 5:30 PM, so what distinguishes them?</p>
+        <div class="rg" data-n="ot_group_diff">
+          <label class="ro"><input type="radio" name="ot_group_diff" value="Different fixed OT amounts per 1.5h block"><div><div class="ol">Different fixed amounts paid per 1.5-hour block</div></div></label>
+          <label class="ro"><input type="radio" name="ot_group_diff" value="Different job categories but same OT amount"><div><div class="ol">Different job categories but the same OT amount</div></div></label>
+          <label class="ro"><input type="radio" name="ot_group_diff" value="No difference — they are actually the same group"><div><div class="ol">No difference — they are actually one group</div></div></label>
+          <label class="ro"><input type="radio" name="ot_group_diff" value="Other difference"><div><div class="ol">Other difference</div></div></label>
+        </div>
+        <div class="cond" id="c_ot_group_diff_other"><textarea name="ot_group_diff_detail" placeholder="Describe what makes the groups different…"></textarea></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="ot_group_diff_c" class="comment-tx" placeholder="List the job titles or departments in each group, or any other details…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Overtime start time per group</label>
+        <div class="hint" style="margin-bottom:8px">Confirm or correct the times below based on what you gathered:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px">
+          <div>
+            <label class="lbl" style="font-size:.78rem;margin-bottom:4px">Group 1 OT starts at:</label>
+            <input type="text" name="ot_start_g1" placeholder="e.g. 17:30">
+          </div>
+          <div>
+            <label class="lbl" style="font-size:.78rem;margin-bottom:4px">Group 2 OT starts at:</label>
+            <input type="text" name="ot_start_g2" placeholder="e.g. 17:30">
+          </div>
+          <div>
+            <label class="lbl" style="font-size:.78rem;margin-bottom:4px">Group 3 OT starts at:</label>
+            <input type="text" name="ot_start_g3" placeholder="e.g. 18:00">
+          </div>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="ot_start_c" class="comment-tx" placeholder="Any groups that have different OT times on certain days…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Fixed amount paid per 1.5-hour overtime block <span class="new-badge">New</span></label>
+        <p class="hint" style="margin-bottom:8px">You mentioned OT is paid per 1.5-hour block at a fixed amount — please provide the amount for each group.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px">
+          <div>
+            <label class="lbl" style="font-size:.78rem;margin-bottom:4px">Group 1 (per 1.5h):</label>
+            <input type="text" name="ot_amount_g1" placeholder="Amount + currency">
+          </div>
+          <div>
+            <label class="lbl" style="font-size:.78rem;margin-bottom:4px">Group 2 (per 1.5h):</label>
+            <input type="text" name="ot_amount_g2" placeholder="Amount + currency">
+          </div>
+          <div>
+            <label class="lbl" style="font-size:.78rem;margin-bottom:4px">Group 3 (per 1.5h):</label>
+            <input type="text" name="ot_amount_g3" placeholder="Amount + currency">
+          </div>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="ot_amount_c" class="comment-tx" placeholder="e.g. Same amount for all groups, or if the amount changes annually…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Night shift overtime (after 1:00 AM)</label>
+        <p class="hint" style="margin-bottom:8px">For printers: 4:30 PM – 1:00 AM is the regular shift. Everything after 1:00 AM is overtime. Is the OT rate after 1:00 AM the same fixed block amount, or different?</p>
+        <div class="rg" data-n="night_ot_rate">
+          <label class="ro"><input type="radio" name="night_ot_rate" value="Same fixed 1.5h block amount as their OT group"><div><div class="ol">Same fixed amount per 1.5h block as their OT group</div></div></label>
+          <label class="ro"><input type="radio" name="night_ot_rate" value="Higher rate for post-1 AM overtime"><div><div class="ol">Higher rate — working past 1:00 AM gets a premium</div></div></label>
+        </div>
+        <div class="cond" id="c_night_ot_premium"><input type="text" name="night_ot_premium_amount" placeholder="Post-1 AM rate or amount per 1.5h block"></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="night_ot_rate_c" class="comment-tx" placeholder="Any other details about how night OT is handled…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Late arrival + overtime: the 30-minute coverage rule</label>
+        <p class="hint" style="margin-bottom:8px">You confirmed: if an employee is late and stays 30 extra minutes, those 30 minutes cover the late — not counted as overtime. Only time beyond that counts as OT. Is this rule applied to all groups?</p>
+        <div class="rg" data-n="late_cover_rule">
+          <label class="ro"><input type="radio" name="late_cover_rule" value="Yes — applies to all groups"><div><div class="ol">Yes — applies to all groups</div></div></label>
+          <label class="ro"><input type="radio" name="late_cover_rule" value="Only for specific groups"><div><div class="ol">Only for specific groups</div></div></label>
+          <label class="ro"><input type="radio" name="late_cover_rule" value="No — late time is deducted AND overtime is counted separately"><div><div class="ol">No — late time is deducted and overtime counted separately</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="late_cover_rule_c" class="comment-tx" placeholder="Any edge cases or exceptions to this rule…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">What happens to leftover minutes that don't add up to a full 1.5h OT block?</label>
+        <div class="rg" data-n="ot_leftover">
+          <label class="ro"><input type="radio" name="ot_leftover" value="Dropped — not paid"><div><div class="ol">Dropped — not paid</div></div></label>
+          <label class="ro"><input type="radio" name="ot_leftover" value="Carried forward to the next month"><div><div class="ol">Carried forward to the next month</div></div></label>
+          <label class="ro"><input type="radio" name="ot_leftover" value="Paid as a fraction of the 1.5h block amount"><div><div class="ol">Paid as a fraction of the block amount</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="ot_leftover_c" class="comment-tx" placeholder="e.g. Minutes below 30 are dropped but 30+ rounds up to a block…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Is overtime mandatory when management requests it, or voluntary?</label>
+        <div class="rg" data-n="ot_mandatory">
+          <label class="ro"><input type="radio" name="ot_mandatory" value="Mandatory — employees must work when asked"><div><div class="ol">Mandatory — employees must work when asked</div></div></label>
+          <label class="ro"><input type="radio" name="ot_mandatory" value="Voluntary — employees may decline"><div><div class="ol">Voluntary — employees may decline</div></div></label>
+          <label class="ro"><input type="radio" name="ot_mandatory" value="Varies by situation"><div><div class="ol">Varies by situation</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="ot_mandatory_c" class="comment-tx" placeholder="Any notes on how OT requests are managed or approved…"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ STEP 5 ══ -->
+  <div class="step" data-step="5">
+    <div class="step-eye">Section 5 of 10</div>
+    <h2 class="step-head">Salary Components &amp; Allowances</h2>
+    <p class="step-desc">You mentioned: Basic + Transportation (tanks × fuel price) + Daman 3% + Income Tax 2%.</p>
+    <div class="card">
+
+      <div class="field">
+        <label class="lbl">Currency salaries are paid in</label>
+        <div class="rg" data-n="currency">
+          <label class="ro"><input type="radio" name="currency" value="USD only"><div><div class="ol">US Dollars (USD) only</div></div></label>
+          <label class="ro"><input type="radio" name="currency" value="LBP only"><div><div class="ol">Lebanese Pounds (LBP) only</div></div></label>
+          <label class="ro"><input type="radio" name="currency" value="Mixed — some components in USD, some in LBP"><div><div class="ol">Mixed — some in USD, some in LBP</div></div></label>
+        </div>
+        <div class="cond" id="c_mixed_curr"><textarea name="currency_detail" placeholder="e.g. Basic salary in USD, transportation in LBP…"></textarea></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="currency_c" class="comment-tx" placeholder="Exchange rate used, how it is determined each month…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Salary components in the standard package (check all that apply)</label>
+        <div class="cg">
+          <label class="co"><input type="checkbox" name="components" value="Basic Salary"><div><div class="ol">Basic Salary</div></div></label>
+          <label class="co"><input type="checkbox" name="components" value="Transportation Allowance"><div><div class="ol">Transportation Allowance</div></div></label>
+          <label class="co"><input type="checkbox" name="components" value="Daman Health Insurance (deduction)"><div><div class="ol">Daman Health Insurance — deducted from salary</div></div></label>
+          <label class="co"><input type="checkbox" name="components" value="Income Tax (deduction)"><div><div class="ol">Income Tax — deducted from salary</div></div></label>
+          <label class="co"><input type="checkbox" name="components" value="Housing Allowance"><div><div class="ol">Housing Allowance</div></div></label>
+          <label class="co"><input type="checkbox" name="components" value="Food / Meal Allowance"><div><div class="ol">Food / Meal Allowance</div></div></label>
+          <label class="co"><input type="checkbox" name="components" value="Phone / Communication Allowance"><div><div class="ol">Phone / Communication Allowance</div></div></label>
+        </div>
+        <div style="margin-top:8px"><input type="text" name="components_other" placeholder="Other components not listed above…"></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="components_c" class="comment-tx" placeholder="Any components that only apply to certain departments or positions…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Daman deduction (3%) — calculated on which base? <span class="new-badge">New</span></label>
+        <div class="rg" data-n="daman_base">
+          <label class="ro"><input type="radio" name="daman_base" value="Basic salary only"><div><div class="ol">Basic salary only</div></div></label>
+          <label class="ro"><input type="radio" name="daman_base" value="Gross salary (basic + transportation + all allowances)"><div><div class="ol">Gross salary — basic + transportation + all allowances</div></div></label>
+          <label class="ro"><input type="radio" name="daman_base" value="Basic + transportation only"><div><div class="ol">Basic + transportation only</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="daman_base_c" class="comment-tx" placeholder="Any exceptions, employees with a different Daman rate…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Is NSSF (National Social Security Fund) registered and handled separately from Daman? <span class="new-badge">New</span></label>
+        <div class="rg" data-n="nssf_vs_daman">
+          <label class="ro"><input type="radio" name="nssf_vs_daman" value="Yes — NSSF is registered and deducted separately from Daman"><div><div class="ol">Yes — NSSF is registered and deducted separately</div><div class="od">Employee pays 2% NSSF health + company pays 21.5% employer share</div></div></label>
+          <label class="ro"><input type="radio" name="nssf_vs_daman" value="No — Daman is our only health insurance, no NSSF"><div><div class="ol">No — Daman is our only health coverage, no NSSF registration</div></div></label>
+          <label class="ro"><input type="radio" name="nssf_vs_daman" value="Both — NSSF registered and Daman as supplementary insurance"><div><div class="ol">Both — NSSF is registered AND Daman is supplementary top-up</div></div></label>
+          <label class="ro"><input type="radio" name="nssf_vs_daman" value="Not sure"><div><div class="ol">Not sure</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="nssf_vs_daman_c" class="comment-tx" placeholder="e.g. Some employees have NSSF and others only Daman…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Income tax — confirmed at 2%. Is this a flat rate applied to all employees?</label>
+        <div class="rg" data-n="tax_rate">
+          <label class="ro"><input type="radio" name="tax_rate" value="Yes — flat 2% for all employees"><div><div class="ol">Yes — flat 2% withheld from all employees</div></div></label>
+          <label class="ro"><input type="radio" name="tax_rate" value="No — varies by employee income level (Lebanese tax brackets)"><div><div class="ol">No — varies by income level per Lebanese tax law brackets</div></div></label>
+          <label class="ro"><input type="radio" name="tax_rate" value="Not sure"><div><div class="ol">Not sure — we need guidance</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="tax_rate_c" class="comment-tx" placeholder="e.g. Exemptions for certain employees, how marital status affects the rate…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Salary advances — you mentioned these are offered. How are they repaid?</label>
+        <div class="rg" data-n="advances">
+          <label class="ro"><input type="radio" name="advances" value="Deducted in full from the following month's salary"><div><div class="ol">Deducted in full from the following month's salary</div></div></label>
+          <label class="ro"><input type="radio" name="advances" value="Deducted in installments agreed with the employee"><div><div class="ol">Deducted in installments — agreed individually per employee</div></div></label>
+          <label class="ro"><input type="radio" name="advances" value="Fixed installment amount each month regardless of advance size"><div><div class="ol">Fixed installment amount each month</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="advances_c" class="comment-tx" placeholder="e.g. Who approves advances, maximum advance amount allowed, interest…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Does the company pay performance or annual bonuses?</label>
+        <div class="rg" data-n="bonuses">
+          <label class="ro"><input type="radio" name="bonuses" value="Yes"><div><div class="ol">Yes</div></div></label>
+          <label class="ro"><input type="radio" name="bonuses" value="No"><div><div class="ol">No</div></div></label>
+        </div>
+        <div class="cond" id="c_bonuses"><textarea name="bonuses_detail" placeholder="How is it calculated? When paid? Who is eligible?"></textarea></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="bonuses_c" class="comment-tx" placeholder="Any other bonus types, production bonuses, attendance bonuses…"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ STEP 6 ══ -->
+  <div class="step" data-step="6">
+    <div class="step-eye">Section 6 of 10</div>
+    <h2 class="step-head">Transportation Allowance</h2>
+    <p class="step-desc">You confirmed: tanks/month × average tank price. Below are a few details still needed.</p>
+    <div class="card">
+
+      <div class="field">
+        <label class="lbl">Is the number of tanks per employee fixed or adjustable?</label>
+        <div class="rg" data-n="tanks_fixed">
+          <label class="ro"><input type="radio" name="tanks_fixed" value="Fixed at hiring — only changes if the role changes"><div><div class="ol">Fixed — agreed at hiring, only changes with role</div></div></label>
+          <label class="ro"><input type="radio" name="tanks_fixed" value="Variable — HR can adjust month to month"><div><div class="ol">Variable — HR can adjust month to month</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="tanks_fixed_c" class="comment-tx" placeholder="e.g. Who has authority to change a tank allocation…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Maximum tanks allowed per employee (leave blank if no cap)</label>
+        <input type="number" name="tanks_max" min="1" placeholder="e.g. 6">
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="tanks_max_c" class="comment-tx" placeholder="Different caps for different positions or departments…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Fuel price reference used each month</label>
+        <div class="rg" data-n="fuel_ref">
+          <label class="ro"><input type="radio" name="fuel_ref" value="Official Lebanese Ministry of Energy published price"><div><div class="ol">Official Lebanese Ministry of Energy published price</div><div class="od">The government-set 20-litre tank price</div></div></label>
+          <label class="ro"><input type="radio" name="fuel_ref" value="Actual market / pump price"><div><div class="ol">Actual market / pump price</div></div></label>
+          <label class="ro"><input type="radio" name="fuel_ref" value="Internal fixed rate set by management"><div><div class="ol">Internal fixed rate set by management</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="fuel_ref_c" class="comment-tx" placeholder="e.g. Which week's price is used, who enters the price each month…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Transportation when an employee takes annual leave <span class="new-badge">New</span></label>
+        <p class="hint" style="margin-bottom:8px">You confirmed that transportation is deducted when an employee is on leave. How exactly is this calculated?</p>
+        <div class="rg" data-n="transport_leave">
+          <label class="ro"><input type="radio" name="transport_leave" value="Deducted per leave day — prorated from the monthly amount"><div><div class="ol">Deducted per leave day — prorated from the monthly amount</div><div class="od">e.g. 1 day leave = monthly transport ÷ working days in the month</div></div></label>
+          <label class="ro"><input type="radio" name="transport_leave" value="Full month transport withheld if any leave is taken"><div><div class="ol">Full month transport withheld if any leave is taken</div></div></label>
+          <label class="ro"><input type="radio" name="transport_leave" value="Not deducted for short leave (below a threshold)"><div><div class="ol">Not deducted for short leave — only deducted above a threshold</div></div></label>
+        </div>
+        <div class="cond" id="c_transport_leave_threshold">
+          <input type="number" name="transport_leave_threshold_days" placeholder="Leave threshold in days (e.g. deduct only if absent more than 3 days)">
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="transport_leave_c" class="comment-tx" placeholder="Any exceptions, e.g. sick leave vs annual leave treated differently…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Transportation for employees on unpaid absence (not on approved leave)</label>
+        <div class="rg" data-n="transport_absent">
+          <label class="ro"><input type="radio" name="transport_absent" value="Same rule as leave — deducted per absent day"><div><div class="ol">Same rule as leave — deducted per absent day</div></div></label>
+          <label class="ro"><input type="radio" name="transport_absent" value="Full month withheld if absent without approval"><div><div class="ol">Full month withheld if absent without approval</div></div></label>
+          <label class="ro"><input type="radio" name="transport_absent" value="Handled case by case by HR"><div><div class="ol">Handled case by case by HR</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="transport_absent_c" class="comment-tx" placeholder="Any other details about absence and transport deduction…"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ STEP 7 ══ -->
+  <div class="step" data-step="7">
+    <div class="step-eye">Section 7 of 10</div>
+    <h2 class="step-head">Tax &amp; Deductions</h2>
+    <p class="step-desc">Confirmed: Daman 3% + Income Tax 2%. A few more details needed.</p>
+    <div class="card">
+
+      <div class="field">
+        <label class="lbl">Does the company withhold income tax and pay the Ministry of Finance?</label>
+        <div class="rg" data-n="tax_withheld">
+          <label class="ro"><input type="radio" name="tax_withheld" value="Yes — company deducts and remits monthly"><div><div class="ol">Yes — we deduct and remit monthly</div></div></label>
+          <label class="ro"><input type="radio" name="tax_withheld" value="No — each employee handles their own filing"><div><div class="ol">No — each employee handles their own filing</div></div></label>
+          <label class="ro"><input type="radio" name="tax_withheld" value="Not sure"><div><div class="ol">Not sure</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="tax_withheld_c" class="comment-tx" placeholder="Who handles the annual tax declaration, any exemptions…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Should the tax deduction appear on each payslip?</label>
+        <div class="rg" data-n="tax_payslip">
+          <label class="ro"><input type="radio" name="tax_payslip" value="Yes — show calculated tax on each payslip"><div><div class="ol">Yes</div></div></label>
+          <label class="ro"><input type="radio" name="tax_payslip" value="No — we handle tax separately"><div><div class="ol">No — handled separately</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="tax_payslip_c" class="comment-tx" placeholder="Any other notes on how tax is shown or communicated to employees…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Other regular deductions (check all that apply)</label>
+        <div class="cg">
+          <label class="co"><input type="checkbox" name="deductions" value="NSSF employee contribution"><div><div class="ol">NSSF employee contribution (2%)</div></div></label>
+          <label class="co"><input type="checkbox" name="deductions" value="Daman health insurance"><div><div class="ol">Daman health insurance (3%)</div></div></label>
+          <label class="co"><input type="checkbox" name="deductions" value="Salary advance repayment"><div><div class="ol">Salary advance repayment</div></div></label>
+          <label class="co"><input type="checkbox" name="deductions" value="Unpaid absence"><div><div class="ol">Unpaid absence deduction</div></div></label>
+          <label class="co"><input type="checkbox" name="deductions" value="Late arrival deduction"><div><div class="ol">Late arrival deduction</div></div></label>
+        </div>
+        <div style="margin-top:8px"><input type="text" name="deductions_other" placeholder="Other deductions not listed…"></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="deductions_c" class="comment-tx" placeholder="Order in which deductions are applied, any priority rules…"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ STEP 8 ══ -->
+  <div class="step" data-step="8">
+    <div class="step-eye">Section 8 of 10</div>
+    <h2 class="step-head">End-of-Service &amp; Lebanese Labor Law</h2>
+    <p class="step-desc">Under Lebanese Labor Law, employees are entitled to indemnity when they leave.</p>
+    <div class="card">
+
+      <div class="field">
+        <label class="lbl">End-of-service indemnity policy</label>
+        <div class="rg" data-n="eos_policy">
+          <label class="ro"><input type="radio" name="eos_policy" value="Lebanese Labor Law — exact tiers"><div><div class="ol">Lebanese Labor Law — we follow it exactly</div><div class="od">1 month/year · years 1–5 · 1.5 months · years 6–10 · 2 months · beyond 10 years</div></div></label>
+          <label class="ro"><input type="radio" name="eos_policy" value="More generous than the law"><div><div class="ol">More generous than the law</div></div></label>
+          <label class="ro"><input type="radio" name="eos_policy" value="Custom policy"><div><div class="ol">Custom policy</div></div></label>
+        </div>
+        <div class="cond" id="c_eos_custom"><textarea name="eos_custom" placeholder="Describe your end-of-service policy…"></textarea></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="eos_policy_c" class="comment-tx" placeholder="Any exceptions for probation period employees, senior executives…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">End-of-service is calculated on</label>
+        <div class="rg" data-n="eos_base">
+          <label class="ro"><input type="radio" name="eos_base" value="Basic salary only"><div><div class="ol">Basic salary only</div></div></label>
+          <label class="ro"><input type="radio" name="eos_base" value="Basic salary + transportation"><div><div class="ol">Basic salary + transportation allowance</div></div></label>
+          <label class="ro"><input type="radio" name="eos_base" value="Full package including all allowances"><div><div class="ol">Full package including all allowances</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="eos_base_c" class="comment-tx" placeholder="Any components included or excluded that are unusual…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">For an employee who resigns voluntarily</label>
+        <div class="rg" data-n="eos_resign">
+          <label class="ro"><input type="radio" name="eos_resign" value="Full indemnity — same as termination"><div><div class="ol">Full indemnity — same as termination</div></div></label>
+          <label class="ro"><input type="radio" name="eos_resign" value="Partial — reduced for resignation"><div><div class="ol">Partial — reduced for resignation</div></div></label>
+          <label class="ro"><input type="radio" name="eos_resign" value="No indemnity if resignation is within the first year"><div><div class="ol">No indemnity if resigned within the first year</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="eos_resign_c" class="comment-tx" placeholder="Any situations where the full indemnity is forfeited (misconduct, etc.)…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Should the system track the monthly end-of-service accrual per employee?</label>
+        <div class="rg" data-n="eos_accrual">
+          <label class="ro"><input type="radio" name="eos_accrual" value="Yes — show on the HR dashboard each month"><div><div class="ol">Yes — show on the HR dashboard each month</div></div></label>
+          <label class="ro"><input type="radio" name="eos_accrual" value="No — calculate only when an employee leaves"><div><div class="ol">No — calculate only when an employee leaves</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="eos_accrual_c" class="comment-tx" placeholder="Any other notes on how EOS provisions are managed internally…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Probation period for new employees</label>
+        <select name="probation">
+          <option value="">— Select —</option>
+          <option>No formal probation period</option>
+          <option>1 month</option>
+          <option>3 months</option>
+          <option>6 months</option>
+          <option>Varies by position</option>
+        </select>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="probation_c" class="comment-tx" placeholder="EOS and leave entitlement during probation, can it be extended…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Notice period for resignation or termination</label>
+        <select name="notice">
+          <option value="">— Select —</option>
+          <option>Per Lebanese Labor Law (based on years of service)</option>
+          <option>1 month</option>
+          <option>2 months</option>
+          <option>3 months</option>
+          <option>Varies by position or contract</option>
+        </select>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="notice_c" class="comment-tx" placeholder="Payment in lieu of notice, garden leave arrangements…"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ STEP 9 ══ -->
+  <div class="step" data-step="9">
+    <div class="step-eye">Section 9 of 10</div>
+    <h2 class="step-head">Leave Policy</h2>
+    <p class="step-desc">Confirmed: 1.25 days/month for first 5 years, 1.42 days/month after 5 years.</p>
+    <div class="card">
+
+      <div class="field">
+        <label class="lbl">Annual leave accrual rates — please confirm:</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
+          <div>
+            <label class="lbl" style="font-size:.78rem;margin-bottom:4px">Years 1–5 (days/month):</label>
+            <input type="number" name="leave_std" step="0.01" value="1.25">
+          </div>
+          <div>
+            <label class="lbl" style="font-size:.78rem;margin-bottom:4px">After 5 years (days/month):</label>
+            <input type="number" name="leave_senior" step="0.01" value="1.42">
+          </div>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="leave_rates_c" class="comment-tx" placeholder="Any other accrual tiers, or positions with a different rate…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Can unused annual leave be carried forward?</label>
+        <div class="rg" data-n="leave_carry">
+          <label class="ro"><input type="radio" name="leave_carry" value="Yes — unlimited carryover"><div><div class="ol">Yes — unlimited carryover</div></div></label>
+          <label class="ro"><input type="radio" name="leave_carry" value="Yes — capped at a maximum"><div><div class="ol">Yes — but capped at a maximum number of days</div></div></label>
+          <label class="ro"><input type="radio" name="leave_carry" value="No — unused leave forfeited at year end"><div><div class="ol">No — forfeited at year end</div></div></label>
+        </div>
+        <div class="cond" id="c_carry_cap"><input type="number" name="carry_cap_days" placeholder="Maximum days that can be carried forward"></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="leave_carry_c" class="comment-tx" placeholder="Any payout policy for unused leave, conditions for forfeiture…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Sick leave policy</label>
+        <div class="rg" data-n="sick_leave">
+          <label class="ro"><input type="radio" name="sick_leave" value="Per Lebanese Labor Law"><div><div class="ol">Per Lebanese Labor Law</div><div class="od">Full pay · 1st month ill · 2/3 pay · 2nd month · Half pay · 3rd month</div></div></label>
+          <label class="ro"><input type="radio" name="sick_leave" value="Custom policy"><div><div class="ol">Custom policy</div></div></label>
+        </div>
+        <div class="cond" id="c_sick_custom"><textarea name="sick_custom" placeholder="Describe the sick leave policy…"></textarea></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="sick_leave_c" class="comment-tx" placeholder="Medical certificate requirements, any limits per year…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Maternity leave</label>
+        <div class="rg" data-n="maternity">
+          <label class="ro"><input type="radio" name="maternity" value="Lebanese Labor Law minimum — 70 calendar days"><div><div class="ol">Lebanese Labor Law minimum — 70 calendar days</div></div></label>
+          <label class="ro"><input type="radio" name="maternity" value="90 days"><div><div class="ol">90 calendar days</div></div></label>
+          <label class="ro"><input type="radio" name="maternity" value="Custom"><div><div class="ol">Custom</div></div></label>
+        </div>
+        <div class="cond" id="c_mat_custom"><input type="number" name="maternity_days" placeholder="Number of days"></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="maternity_c" class="comment-tx" placeholder="Paid / unpaid split, any extension options…"></textarea></div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Paternity leave days (0 if not provided)</label>
+        <input type="number" name="paternity_days" min="0" placeholder="Number of days">
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="paternity_c" class="comment-tx" placeholder="Paid or unpaid, any conditions…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Can employees take leave in half-days?</label>
+        <div class="rg" data-n="half_day">
+          <label class="ro"><input type="radio" name="half_day" value="Yes"><div><div class="ol">Yes</div></div></label>
+          <label class="ro"><input type="radio" name="half_day" value="No — full days only"><div><div class="ol">No — full days only</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="half_day_c" class="comment-tx" placeholder="Any restrictions on when half-day leave can be taken…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Emergency / personal leave (separate from annual leave)</label>
+        <div class="rg" data-n="emergency">
+          <label class="ro"><input type="radio" name="emergency" value="Yes — fixed days per year"><div><div class="ol">Yes — a fixed number of days per year</div></div></label>
+          <label class="ro"><input type="radio" name="emergency" value="No — taken from annual leave balance"><div><div class="ol">No — taken from annual leave balance</div></div></label>
+        </div>
+        <div class="cond" id="c_emergency"><input type="number" name="emergency_days" placeholder="Number of emergency/personal days per year"></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="emergency_c" class="comment-tx" placeholder="What qualifies as an emergency, approval process…"></textarea></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ STEP 10 ══ -->
+  <div class="step" data-step="10">
+    <div class="step-eye">Section 10 of 10</div>
+    <h2 class="step-head">Payslips &amp; Final Notes</h2>
+    <p class="step-desc">Last section. You are currently using Dolphin payroll — this system will replace that workflow.</p>
+    <div class="card">
+
+      <div class="field">
+        <label class="lbl">Payslip language</label>
+        <div class="rg" data-n="payslip_lang">
+          <label class="ro"><input type="radio" name="payslip_lang" value="English only"><div><div class="ol">English only</div></div></label>
+          <label class="ro"><input type="radio" name="payslip_lang" value="Arabic only"><div><div class="ol">Arabic only</div></div></label>
+          <label class="ro"><input type="radio" name="payslip_lang" value="Bilingual — English and Arabic"><div><div class="ol">Bilingual — English and Arabic</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="payslip_lang_c" class="comment-tx" placeholder="Any specific items that must appear in Arabic by law or preference…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">How should payslips be distributed?</label>
+        <div class="rg" data-n="payslip_dist">
+          <label class="ro"><input type="radio" name="payslip_dist" value="Emailed automatically to each employee"><div><div class="ol">Emailed automatically to each employee at month end</div></div></label>
+          <label class="ro"><input type="radio" name="payslip_dist" value="Employees download from the HR portal"><div><div class="ol">Employees download from the HR portal themselves</div></div></label>
+          <label class="ro"><input type="radio" name="payslip_dist" value="HR prints and distributes manually"><div><div class="ol">HR prints and distributes manually</div></div></label>
+        </div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="payslip_dist_c" class="comment-tx" placeholder="Any employees without email (production staff), print only for some…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">From Dolphin payroll — are there any reports or outputs from Dolphin that must be replicated in the new system?</label>
+        <textarea name="dolphin_reports" placeholder="e.g. Monthly payroll summary, NSSF reports, Ministry of Finance reports, bank transfer file…"></textarea>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="dolphin_reports_c" class="comment-tx" placeholder="Any other integration or export requirements…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Do different departments have different payroll rules?</label>
+        <div class="rg" data-n="dept_rules">
+          <label class="ro"><input type="radio" name="dept_rules" value="No — same rules for all"><div><div class="ol">No — same rules for all departments</div></div></label>
+          <label class="ro"><input type="radio" name="dept_rules" value="Yes — some departments differ"><div><div class="ol">Yes — some departments have different rules</div></div></label>
+        </div>
+        <div class="cond" id="c_dept_rules"><textarea name="dept_rules_detail" placeholder="Which departments differ and how?"></textarea></div>
+        <div class="comment-wrap"><span class="comment-lbl">Comments</span><textarea name="dept_rules_c" class="comment-tx" placeholder="Production vs office vs management differences…"></textarea></div>
+      </div>
+
+      <hr class="dv">
+      <div class="field">
+        <label class="lbl">Anything else we should know?</label>
+        <textarea name="notes" rows="5" placeholder="Any other policies, special arrangements, or requirements not covered above…"></textarea>
+      </div>
+
+    </div>
+    <div class="card accent">
+      <p style="font-size:.86rem;line-height:1.6"><strong>Ready?</strong> Click Submit — a full summary of your answers will appear so you can copy or email it directly.</p>
+    </div>
+  </div>
+
+  <!-- Hidden fields for Formspree -->
+  <input type="hidden" id="hf_summary" name="formatted_summary" value="">
+  <input type="hidden" id="hf_subject" name="_subject" value="Byblos HR Setup Questionnaire">
+
+  <!-- NAV -->
+  <div class="nav" id="navRow">
+    <button type="button" class="btn btn-sec" id="btnPrev" onclick="go(-1)" style="display:none">← Previous</button>
+    <div class="nav-spacer"></div>
+    <button type="button" class="btn btn-pri" id="btnNext" onclick="go(1)">Next →</button>
+    <button type="button" class="btn btn-grn" id="btnSub" onclick="doSubmit()" style="display:none">Submit ✓</button>
+  </div>
+
+  </form>
+
+  <!-- DONE SCREEN -->
+  <div class="done" id="doneScreen">
+    <div class="done-icon">✓</div>
+    <h2>Thank you!</h2>
+    <p>Your answers are compiled below. Copy the text and email it, or use the button to open your email app with it pre-filled.</p>
+    <div class="summary-box" id="summaryBox"></div>
+    <div class="btn-row">
+      <button class="btn btn-grn" onclick="doCopy(this)">Copy to Clipboard</button>
+      <button class="btn btn-pri" onclick="doEmail()">Open in Email App</button>
+    </div>
+    <p class="email-note">Send to: <strong>fshehadeh@gmail.com</strong></p>
+  </div>
+</div>
+
+<script>
+const STEPS = 10;
+let cur = 1;
+const titles = ['','Company & Contacts','Work Schedule','Attendance Machine','Overtime Rules','Salary & Allowances','Transportation','Tax & Deductions','End-of-Service','Leave Policy','Payslips & Notes'];
+
+const CONDS = {
+  work_days:          {t:['Varies by department'],id:'c_workdays_vary'},
+  night_shifts_type:  {t:['2 different time windows','Other arrangement'],id:'c_night_shifts_other'},
+  night_prem:         {t:['Yes'],id:'c_night_prem'},
+  att_software:       {t:['Other software'],id:'c_att_software_other'},
+  late_rule:          {t:['Custom policy'],id:'c_late_custom'},
+  early_rule:         {t:['Custom policy'],id:'c_early_custom'},
+  ot_group_diff:      {t:['Other difference'],id:'c_ot_group_diff_other'},
+  night_ot_rate:      {t:['Higher rate for post-1 AM overtime'],id:'c_night_ot_premium'},
+  currency:           {t:['Mixed — some components in USD, some in LBP'],id:'c_mixed_curr'},
+  bonuses:            {t:['Yes'],id:'c_bonuses'},
+  transport_leave:    {t:['Not deducted for short leave (below a threshold)'],id:'c_transport_leave_threshold'},
+  eos_policy:         {t:['More generous than the law','Custom policy'],id:'c_eos_custom'},
+  leave_carry:        {t:['Yes — capped at a maximum'],id:'c_carry_cap'},
+  sick_leave:         {t:['Custom policy'],id:'c_sick_custom'},
+  maternity:          {t:['Custom'],id:'c_mat_custom'},
+  emergency:          {t:['Yes — fixed days per year'],id:'c_emergency'},
+  dept_rules:         {t:['Yes — some departments differ'],id:'c_dept_rules'},
+};
+
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.type === 'radio') {
+    const rg = el.closest('.rg');
+    if (rg) rg.querySelectorAll('.ro').forEach(r => r.classList.remove('on'));
+    el.closest('.ro')?.classList.add('on');
+    const cfg = CONDS[el.name];
+    if (cfg?.id) document.getElementById(cfg.id)?.classList.toggle('on', cfg.t.includes(el.value));
+  }
+  if (el.type === 'checkbox') el.closest('.co')?.classList.toggle('on', el.checked);
+});
+
+function go(dir){ cur = Math.max(1, Math.min(STEPS, cur+dir)); refresh(); }
+
+function refresh(){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('on'));
+  document.querySelector(`.step[data-step="${cur}"]`)?.classList.add('on');
+  document.getElementById('progFill').style.width=(cur/STEPS*100)+'%';
+  document.getElementById('progName').textContent=titles[cur];
+  document.getElementById('progCount').textContent=`Step ${cur} of ${STEPS}`;
+  document.getElementById('btnPrev').style.display=cur>1?'':'none';
+  document.getElementById('btnNext').style.display=cur<STEPS?'':'none';
+  document.getElementById('btnSub').style.display=cur===STEPS?'':'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function fv(name){
+  const form=document.getElementById('frm');
+  // checkbox
+  const cbs=[...form.querySelectorAll(`input[type=checkbox][name="${name}"]:checked`)];
+  if(cbs.length>0) return cbs.map(c=>c.value).join(', ');
+  // radio
+  const r=form.querySelector(`input[type=radio][name="${name}"]:checked`);
+  if(r) return r.value;
+  // text/number/select/textarea
+  const el=form.querySelector(`[name="${name}"]`);
+  return el?el.value.trim():'';
+}
+
+function row(label,name){
+  const v=fv(name)||'—';
+  const c=fv(name+'_c');
+  return `${label}: ${v}${c?'\n    ↳ '+c:''}\n`;
+}
+
+function buildSummary(){
+  return `BYBLOS PRINTING SAL — HR SYSTEM SETUP
+Submitted: ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}
+${'─'.repeat(54)}
+
+SECTION 1 — COMPANY & CONTACTS
+${row('Total employees','emp_count')}${row('Departments','depts')}${row('HR system contacts','contacts')}${row('Payday','payday')}
+SECTION 2 — WORK SCHEDULE
+${row('Days per week','work_days')}${row('Dept schedule notes','work_days_detail')}${row('Active shifts','active_shifts')}${row('Night shift structure','night_shifts_type')}${row('Night shift detail','night_shifts_other_detail')}${row('Night shift premium','night_prem')}${row('Night premium rate','night_prem_rate')}${row('Public holidays','pub_hol')}
+SECTION 3 — ATTENDANCE MACHINE
+${row('Machine brand/model','machine_model')}${row('Attendance software','att_software')}${row('Software name','att_software_name')}${row('Number of machines','machine_count')}${row('Machine locations','machine_locations')}${row('Grace period','grace_period')}${row('Late arrival rule','late_rule')}${row('Late arrival detail','late_custom')}${row('Early departure rule','early_rule')}${row('Early departure detail','early_custom')}
+SECTION 4 — OVERTIME RULES
+${row('Group 1 vs Group 2 difference','ot_group_diff')}${row('Group diff detail','ot_group_diff_detail')}${row('Group 1 OT starts at','ot_start_g1')}${row('Group 2 OT starts at','ot_start_g2')}${row('Group 3 OT starts at','ot_start_g3')}${row('Group 1 fixed amount per 1.5h','ot_amount_g1')}${row('Group 2 fixed amount per 1.5h','ot_amount_g2')}${row('Group 3 fixed amount per 1.5h','ot_amount_g3')}${row('Night OT rate (after 1 AM)','night_ot_rate')}${row('Night OT premium amount','night_ot_premium_amount')}${row('Late + 30min coverage rule','late_cover_rule')}${row('Leftover OT minutes','ot_leftover')}${row('OT mandatory/voluntary','ot_mandatory')}
+SECTION 5 — SALARY & ALLOWANCES
+${row('Currency','currency')}${row('Currency details','currency_detail')}${row('Salary components','components')}${row('Other components','components_other')}${row('Daman 3% base','daman_base')}${row('NSSF vs Daman','nssf_vs_daman')}${row('Income tax rate','tax_rate')}${row('Salary advances','advances')}${row('Bonuses','bonuses')}${row('Bonus details','bonuses_detail')}
+SECTION 6 — TRANSPORTATION
+${row('Tanks fixed/variable','tanks_fixed')}${row('Max tanks per employee','tanks_max')}${row('Fuel price reference','fuel_ref')}${row('Transport deduction on leave','transport_leave')}${row('Leave threshold days','transport_leave_threshold_days')}${row('Transport on unpaid absence','transport_absent')}
+SECTION 7 — TAX & DEDUCTIONS
+${row('Income tax withheld','tax_withheld')}${row('Tax on payslip','tax_payslip')}${row('Other deductions','deductions')}${row('Other deductions detail','deductions_other')}
+SECTION 8 — END-OF-SERVICE
+${row('EOS policy','eos_policy')}${row('EOS custom detail','eos_custom')}${row('EOS calculated on','eos_base')}${row('EOS for resignation','eos_resign')}${row('Monthly accrual tracking','eos_accrual')}${row('Probation period','probation')}${row('Notice period','notice')}
+SECTION 9 — LEAVE POLICY
+${row('Standard leave rate (days/month)','leave_std')}${row('Senior leave rate (days/month)','leave_senior')}${row('Leave carryover','leave_carry')}${row('Carryover cap (days)','carry_cap_days')}${row('Sick leave','sick_leave')}${row('Sick leave detail','sick_custom')}${row('Maternity leave','maternity')}${row('Maternity days','maternity_days')}${row('Paternity days','paternity_days')}${row('Half-day leave','half_day')}${row('Emergency leave','emergency')}${row('Emergency days','emergency_days')}
+SECTION 10 — PAYSLIPS
+${row('Payslip language','payslip_lang')}${row('Payslip distribution','payslip_dist')}${row('Dolphin reports to replicate','dolphin_reports')}${row('Department-specific rules','dept_rules')}${row('Dept rules detail','dept_rules_detail')}${row('Additional notes','notes')}`;
+}
+
+async function doSubmit(){
+  const summary = buildSummary();
+  document.getElementById('summaryBox').textContent = summary;
+
+  // Populate hidden fields
+  document.getElementById('hf_summary').value = summary;
+  const contactName = fv('contacts').split('\n')[0].split('—')[0].trim();
+  document.getElementById('hf_subject').value = 'Byblos HR Setup — ' + (contactName || 'Client Response');
+
+  // Show submitting state
+  const btn = document.getElementById('btnSub');
+  btn.textContent = 'Submitting…';
+  btn.disabled = true;
+
+  // POST to PHP endpoint — silent fail, client still sees summary to copy
+  try {
+    const data = new FormData(document.getElementById('frm'));
+    await fetch('api/questionnaire/submit', {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    });
+  } catch(e) { /* silent */ }
+
+  // Show success screen
+  document.getElementById('frm').style.display = 'none';
+  document.getElementById('navRow').style.display = 'none';
+  document.getElementById('progBar').style.display = 'none';
+  document.querySelector('.skip-note').style.display = 'none';
+  document.getElementById('doneScreen').classList.add('on');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function doCopy(btn){
+  navigator.clipboard.writeText(document.getElementById('summaryBox').textContent).then(()=>{
+    btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy to Clipboard',2000);
+  });
+}
+function doEmail(){
+  const s=encodeURIComponent('Byblos Printing SAL — HR Setup Questionnaire');
+  const b=encodeURIComponent(document.getElementById('summaryBox').textContent.substring(0,1900));
+  window.open(`mailto:fshehadeh@gmail.com?subject=${s}&body=${b}`);
+}
+
+refresh();
+</script>

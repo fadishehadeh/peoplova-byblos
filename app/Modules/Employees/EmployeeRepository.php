@@ -406,13 +406,14 @@ final class EmployeeRepository
     public function formOptions(?int $excludeEmployeeId = null): array
     {
         return [
-            'companies' => $this->optionList('SELECT id, name FROM companies WHERE status = :status ORDER BY name ASC', ['status' => 'active']),
-            'branches' => $this->optionList('SELECT id, name FROM branches WHERE status = :status ORDER BY name ASC', ['status' => 'active']),
-            'departments' => $this->optionList('SELECT id, name FROM departments WHERE status = :status ORDER BY name ASC', ['status' => 'active']),
-            'teams' => $this->optionList('SELECT id, name FROM teams WHERE status = :status ORDER BY name ASC', ['status' => 'active']),
-            'job_titles' => $this->optionList('SELECT id, name FROM job_titles WHERE status = :status ORDER BY name ASC', ['status' => 'active']),
+            'companies'    => $this->optionList('SELECT id, name FROM companies WHERE status = :status ORDER BY name ASC', ['status' => 'active']),
+            'branches'     => $this->optionList('SELECT id, name FROM branches WHERE status = :status ORDER BY name ASC', ['status' => 'active']),
+            'departments'  => $this->optionList('SELECT id, name FROM departments WHERE status = :status ORDER BY name ASC', ['status' => 'active']),
+            'teams'        => $this->optionList('SELECT id, name FROM teams WHERE status = :status ORDER BY name ASC', ['status' => 'active']),
+            'job_titles'   => $this->optionList('SELECT id, name FROM job_titles WHERE status = :status ORDER BY name ASC', ['status' => 'active']),
             'designations' => $this->optionList('SELECT id, name FROM designations WHERE status = :status ORDER BY name ASC', ['status' => 'active']),
-            'managers' => $this->managerOptions($excludeEmployeeId),
+            'managers'     => $this->managerOptions($excludeEmployeeId),
+            'ot_groups'    => (function () { try { return $this->database->fetchAll('SELECT id, name FROM ot_groups WHERE is_active = 1 ORDER BY name ASC'); } catch (\Throwable) { return []; } })(),
         ];
     }
 
@@ -427,12 +428,12 @@ final class EmployeeRepository
                     employee_code, company_id, branch_id, department_id, team_id, job_title_id, designation_id, manager_employee_id,
                     first_name, middle_name, last_name, work_email, personal_email, phone, alternate_phone, date_of_birth,
                     gender, marital_status, nationality, second_nationality, employment_type, contract_type, joining_date, probation_start_date,
-                    probation_end_date, employee_status, id_number, passport_number, notes, created_by, updated_by
+                    probation_end_date, employee_status, id_number, passport_number, notes, ot_group_id, transport_tanks, created_by, updated_by
                  ) VALUES (
                     :employee_code, :company_id, :branch_id, :department_id, :team_id, :job_title_id, :designation_id, :manager_employee_id,
                     :first_name, :middle_name, :last_name, :work_email, :personal_email, :phone, :alternate_phone, :date_of_birth,
                     :gender, :marital_status, :nationality, :second_nationality, :employment_type, :contract_type, :joining_date, :probation_start_date,
-                    :probation_end_date, :employee_status, :id_number, :passport_number, :notes, :created_by, :updated_by
+                    :probation_end_date, :employee_status, :id_number, :passport_number, :notes, :ot_group_id, :transport_tanks, :created_by, :updated_by
                  )',
                 $payload
             );
@@ -498,6 +499,8 @@ final class EmployeeRepository
                     id_number = :id_number,
                     passport_number = :passport_number,
                     notes = :notes,
+                    ot_group_id = :ot_group_id,
+                    transport_tanks = :transport_tanks,
                     updated_by = :updated_by
                  WHERE id = :id',
                 $payload
@@ -1191,6 +1194,8 @@ final class EmployeeRepository
             'id_number' => encrypt_field($this->nullableString($data['id_number'] ?? null)),
             'passport_number' => encrypt_field($this->nullableString($data['passport_number'] ?? null)),
             'notes' => $this->nullableString($data['notes'] ?? null),
+            'ot_group_id' => $this->nullableInt($data['ot_group_id'] ?? null),
+            'transport_tanks' => max(0, min(6, (int) ($data['transport_tanks'] ?? 0))),
             'updated_by' => $actorId,
         ];
     }

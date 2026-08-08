@@ -19,7 +19,7 @@ final class PayrollRepository
     public function companyOptions(): array
     {
         return $this->database->fetchAll(
-            "SELECT id, name FROM companies WHERE status = 'active' AND is_main_tenant = 0 ORDER BY name ASC"
+            "SELECT id, name FROM companies WHERE status = 'active' ORDER BY name ASC"
         );
     }
 
@@ -63,6 +63,8 @@ final class PayrollRepository
                     COALESCE(ss.housing_allowance, 0)   AS housing_allowance,
                     COALESCE(ss.transport_allowance, 0) AS transport_allowance,
                     COALESCE(ss.other_allowances, 0)    AS other_allowances,
+                    COALESCE(ss.daman_rate, 3.00)       AS daman_rate,
+                    COALESCE(ss.income_tax_rate, 2.00)  AS income_tax_rate,
                     ss.currency
              FROM salary_structures ss
              INNER JOIN employees e ON e.id = ss.employee_id
@@ -98,17 +100,19 @@ final class PayrollRepository
             $this->database->execute(
                 'INSERT INTO salary_structures
                      (employee_id, basic_salary, housing_allowance, transport_allowance,
-                      other_allowances, currency, effective_from, effective_to, created_by)
+                      other_allowances, daman_rate, income_tax_rate, currency, effective_from, effective_to, created_by)
                  VALUES
                      (:employee_id, :basic_salary, :housing_allowance, :transport_allowance,
-                      :other_allowances, :currency, :effective_from, NULL, :created_by)',
+                      :other_allowances, :daman_rate, :income_tax_rate, :currency, :effective_from, NULL, :created_by)',
                 [
                     'employee_id'         => $employeeId,
                     'basic_salary'        => (float) $data['basic_salary'],
                     'housing_allowance'   => isset($data['housing_allowance'])   && $data['housing_allowance']   !== '' ? (float) $data['housing_allowance']   : null,
                     'transport_allowance' => isset($data['transport_allowance']) && $data['transport_allowance'] !== '' ? (float) $data['transport_allowance'] : null,
                     'other_allowances'    => isset($data['other_allowances'])    && $data['other_allowances']    !== '' ? (float) $data['other_allowances']    : null,
-                    'currency'            => (string) ($data['currency'] ?? 'QAR'),
+                    'daman_rate'          => isset($data['daman_rate'])          && $data['daman_rate']          !== '' ? (float) $data['daman_rate']          : 3.00,
+                    'income_tax_rate'     => isset($data['income_tax_rate'])     && $data['income_tax_rate']     !== '' ? (float) $data['income_tax_rate']     : 2.00,
+                    'currency'            => (string) ($data['currency'] ?? 'USD'),
                     'effective_from'      => $effectiveFrom,
                     'created_by'          => $actorId,
                 ]
@@ -268,7 +272,7 @@ final class PayrollRepository
 
     /**
      * Populate payroll_run_items for a given run.
-     * Salary values are snapshotted; unpaid leave days deducted automatically.
+     * Salary values are snapshotted; unpaid leave, OT, transport (fuel-based), Daman, and income tax computed automatically.
      *
      * Cross-month note: only leaves whose start_date falls in the target month are counted.
      * HR can manually adjust any line item before finalising.
@@ -277,8 +281,40 @@ final class PayrollRepository
     {
         $structures = $this->allActiveSalaryStructures($companyId);
 
+        // Pre-fetch OT totals by employee for the period
+        $startDate = sprintf('%04d-%02d-01', $year, $month);
+        $endDate   = date('Y-m-t', strtotime($startDate));
+        $otRows    = $this->database->fetchAll(
+            'SELECT oc.employee_id, SUM(oc.ot_amount) AS total_ot
+             FROM ot_calculations oc
+             JOIN employees e ON e.id = oc.employee_id
+             WHERE e.company_id = :cid AND oc.work_date >= :s AND oc.work_date <= :e
+             GROUP BY oc.employee_id',
+            ['cid' => $companyId, 's' => $startDate, 'e' => $endDate]
+        );
+        $otByEmp = [];
+        foreach ($otRows as $r) { $otByEmp[(int) $r['employee_id']] = (float) $r['total_ot']; }
+
+        // Fuel price for this month (USD per tank)
+        $fuelRow     = $this->database->fetch(
+            'SELECT price_per_tank FROM fuel_prices
+             WHERE company_id = :cid AND price_month = :m AND price_year = :y LIMIT 1',
+            ['cid' => $companyId, 'm' => $month, 'y' => $year]
+        );
+        $fuelPerTank = $fuelRow ? (float) $fuelRow['price_per_tank'] : 0.0;
+
+        // Working days in month: Mon–Sat (Lebanon 6-day week)
+        $workingDays = $this->countWorkingDays($month, $year);
+
         foreach ($structures as $s) {
             $employeeId = (int) $s['employee_id'];
+
+            // Employee tank count for transport calculation
+            $empRow = $this->database->fetch(
+                'SELECT transport_tanks FROM employees WHERE id = :id LIMIT 1',
+                ['id' => $employeeId]
+            );
+            $tanks = $empRow ? (int) $empRow['transport_tanks'] : 0;
 
             // Unpaid leave deduction: days where leave starts in the target month
             $unpaidDays = (float) ($this->database->fetchValue(
@@ -293,36 +329,68 @@ final class PayrollRepository
                 ['eid' => $employeeId, 'year' => $year, 'month' => $month]
             ) ?? 0);
 
-            // Daily rate = basic salary / 30 working days (approximation)
-            $dailyRate  = (float) $s['basic_salary'] / 30;
-            $deductions = round($unpaidDays * $dailyRate, 2);
+            $basic   = (float) $s['basic_salary'];
+            $housing = (float) $s['housing_allowance'];
+            $other   = (float) $s['other_allowances'];
 
-            $basic     = (float) $s['basic_salary'];
-            $housing   = (float) $s['housing_allowance'];
-            $transport = (float) $s['transport_allowance'];
-            $other     = (float) $s['other_allowances'];
-            $gross     = round($basic + $housing + $transport + $other, 2);
-            $net       = round($gross - $deductions, 2);
+            // Unpaid leave deduction on basic (daily rate = basic / 30)
+            $deductions = round($unpaidDays * ($basic / 30), 2);
+
+            // OT amount from ot_calculations (pre-computed by BioTime import)
+            $otAmount = $otByEmp[$employeeId] ?? 0.0;
+
+            // Transport: tanks × fuel price, minus pro-rated leave deduction
+            $monthlyTransport      = round($tanks * $fuelPerTank, 2);
+            $transportDeductPerDay = $workingDays > 0 ? ($monthlyTransport / $workingDays) : 0.0;
+            $transportAmount       = max(0.0, round($monthlyTransport - ($unpaidDays * $transportDeductPerDay), 2));
+
+            // Daman and income tax on basic salary
+            $damanRate  = isset($s['daman_rate'])     ? (float) $s['daman_rate']     : 3.0;
+            $taxRate    = isset($s['income_tax_rate']) ? (float) $s['income_tax_rate'] : 2.0;
+            $daman      = round($basic * $damanRate / 100, 2);
+            $incomeTax  = round($basic * $taxRate   / 100, 2);
+
+            $gross = round($basic + $housing + $other + $otAmount + $transportAmount, 2);
+            $net   = round($gross - $deductions - $daman - $incomeTax, 2);
 
             $this->database->execute(
                 'INSERT INTO payroll_run_items
                      (payroll_run_id, employee_id, basic_salary, housing_allowance,
-                      transport_allowance, other_allowances, deductions, gross_total, net_total)
+                      transport_allowance, other_allowances, deductions, gross_total, net_total,
+                      ot_amount, transport_amount, daman_deduction, income_tax_deduction)
                  VALUES
-                     (:run_id, :employee_id, :basic, :housing, :transport, :other, :deductions, :gross, :net)',
+                     (:run_id, :employee_id, :basic, :housing, 0, :other, :deductions, :gross, :net,
+                      :ot, :trans, :daman, :tax)',
                 [
                     'run_id'      => $runId,
                     'employee_id' => $employeeId,
                     'basic'       => $basic,
                     'housing'     => $housing,
-                    'transport'   => $transport,
                     'other'       => $other,
                     'deductions'  => $deductions,
                     'gross'       => $gross,
                     'net'         => $net,
+                    'ot'          => round($otAmount, 2),
+                    'trans'       => $transportAmount,
+                    'daman'       => $daman,
+                    'tax'         => $incomeTax,
                 ]
             );
         }
+    }
+
+    /** Count Mon–Sat days in the given month (Lebanon 6-day week) */
+    private function countWorkingDays(int $month, int $year): int
+    {
+        $days  = 0;
+        $total = (int) date('t', mktime(0, 0, 0, $month, 1, $year));
+        for ($d = 1; $d <= $total; $d++) {
+            $dow = (int) date('N', mktime(0, 0, 0, $month, $d, $year)); // 1=Mon … 7=Sun
+            if ($dow !== 7) { // exclude Sunday only
+                $days++;
+            }
+        }
+        return $days;
     }
 
     /**
@@ -347,34 +415,46 @@ final class PayrollRepository
             throw new \RuntimeException('Cannot edit a finalised payroll run.');
         }
 
-        $basic     = isset($fields['basic_salary'])        ? (float) $fields['basic_salary']        : (float) $item['basic_salary'];
-        $housing   = isset($fields['housing_allowance'])   ? (float) $fields['housing_allowance']   : (float) $item['housing_allowance'];
-        $transport = isset($fields['transport_allowance']) ? (float) $fields['transport_allowance'] : (float) $item['transport_allowance'];
-        $other     = isset($fields['other_allowances'])    ? (float) $fields['other_allowances']    : (float) $item['other_allowances'];
-        $deductions = isset($fields['deductions'])         ? (float) $fields['deductions']          : (float) $item['deductions'];
-        $notes     = isset($fields['notes']) ? (string) $fields['notes'] : (string) ($item['notes'] ?? '');
+        $basic      = isset($fields['basic_salary'])         ? (float) $fields['basic_salary']         : (float) $item['basic_salary'];
+        $housing    = isset($fields['housing_allowance'])    ? (float) $fields['housing_allowance']    : (float) $item['housing_allowance'];
+        $other      = isset($fields['other_allowances'])     ? (float) $fields['other_allowances']     : (float) $item['other_allowances'];
+        $deductions = isset($fields['deductions'])           ? (float) $fields['deductions']           : (float) $item['deductions'];
+        $otAmount   = isset($fields['ot_amount'])            ? (float) $fields['ot_amount']            : (float) ($item['ot_amount'] ?? 0);
+        $transAmount= isset($fields['transport_amount'])     ? (float) $fields['transport_amount']     : (float) ($item['transport_amount'] ?? 0);
+        $daman      = isset($fields['daman_deduction'])      ? (float) $fields['daman_deduction']      : (float) ($item['daman_deduction'] ?? 0);
+        $incomeTax  = isset($fields['income_tax_deduction']) ? (float) $fields['income_tax_deduction'] : (float) ($item['income_tax_deduction'] ?? 0);
+        $advance    = isset($fields['advance_deduction'])    ? (float) $fields['advance_deduction']    : (float) ($item['advance_deduction'] ?? 0);
+        $notes      = isset($fields['notes']) ? (string) $fields['notes'] : (string) ($item['notes'] ?? '');
 
-        $gross = round($basic + $housing + $transport + $other, 2);
-        $net   = round($gross - $deductions, 2);
+        $gross = round($basic + $housing + $other + $otAmount + $transAmount, 2);
+        $net   = round($gross - $deductions - $daman - $incomeTax - $advance, 2);
 
         $this->database->execute(
             'UPDATE payroll_run_items
-             SET basic_salary         = :basic,
-                 housing_allowance    = :housing,
-                 transport_allowance  = :transport,
-                 other_allowances     = :other,
-                 deductions           = :deductions,
-                 gross_total          = :gross,
-                 net_total            = :net,
-                 is_manually_adjusted = 1,
-                 notes                = :notes
+             SET basic_salary           = :basic,
+                 housing_allowance      = :housing,
+                 other_allowances       = :other,
+                 deductions             = :deductions,
+                 ot_amount              = :ot,
+                 transport_amount       = :trans,
+                 daman_deduction        = :daman,
+                 income_tax_deduction   = :tax,
+                 advance_deduction      = :advance,
+                 gross_total            = :gross,
+                 net_total              = :net,
+                 is_manually_adjusted   = 1,
+                 notes                  = :notes
              WHERE id = :id',
             [
                 'basic'      => $basic,
                 'housing'    => $housing,
-                'transport'  => $transport,
                 'other'      => $other,
                 'deductions' => $deductions,
+                'ot'         => round($otAmount, 2),
+                'trans'      => round($transAmount, 2),
+                'daman'      => round($daman, 2),
+                'tax'        => round($incomeTax, 2),
+                'advance'    => round($advance, 2),
                 'gross'      => $gross,
                 'net'        => $net,
                 'notes'      => $notes !== '' ? $notes : null,

@@ -13,8 +13,12 @@ use App\Modules\Api\LeaveApiController;
 use App\Modules\Api\LetterApiController;
 use App\Modules\Api\ProfileApiController;
 use App\Modules\Api\ApiTokenController;
+use App\Modules\Api\QuestionnaireController;
 
 $router = $app->router();
+
+// ── Public: questionnaire submission (no auth — external client form) ────────
+$router->post('/api/questionnaire/submit', [QuestionnaireController::class, 'submit']);
 
 // ── JWT Auth (no middleware — these issue tokens) ─────────────────────────────
 $router->post('/api/v1/auth/login',   [AuthApiController::class, 'login']);

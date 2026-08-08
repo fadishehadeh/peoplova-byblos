@@ -7,6 +7,8 @@ use App\Middleware\AuthMiddleware;
 use App\Middleware\PayrollEnabledMiddleware;
 use App\Middleware\RoleMiddleware;
 use App\Modules\Payroll\PayrollController;
+use App\Modules\Payroll\OtGroupController;
+use App\Modules\Payroll\FuelPriceController;
 
 $router = $app->router();
 
@@ -25,3 +27,14 @@ $router->post('/payroll/runs/items/{id}',              [PayrollController::class
 $router->get('/payroll/runs/{id}/finalize',            [PayrollController::class, 'finalizeRunForm'], [...$base, $hrRole]);
 $router->post('/payroll/runs/{id}/finalize',           [PayrollController::class, 'finalizeRun'],     [...$base, $hrRole]);
 $router->get('/payroll/runs/{runId}/payslip/{empId}',  [PayrollController::class, 'downloadPayslip'], [...$base, $hrRole]);
+
+// ── OT Groups ─────────────────────────────────────────────────────────────────
+$router->get('/payroll/ot-groups',                   [OtGroupController::class, 'index'],   [...$base, $hrRole]);
+$router->post('/payroll/ot-groups',                  [OtGroupController::class, 'store'],   [...$base, $hrRole]);
+$router->get('/payroll/ot-groups/{id}/edit',         [OtGroupController::class, 'edit'],    [...$base, $hrRole]);
+$router->post('/payroll/ot-groups/{id}/edit',        [OtGroupController::class, 'update'],  [...$base, $hrRole]);
+$router->post('/payroll/ot-groups/{id}/delete',      [OtGroupController::class, 'destroy'], [...$base, $hrRole]);
+
+// ── Fuel Prices ───────────────────────────────────────────────────────────────
+$router->get('/payroll/fuel-prices',   [FuelPriceController::class, 'index'], [...$base, $hrRole]);
+$router->post('/payroll/fuel-prices/save', [FuelPriceController::class, 'save'],  [...$base, $hrRole]);

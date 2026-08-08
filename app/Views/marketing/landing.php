@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 declare(strict_types=1);
 if (!empty($contactEmail)) {
     $emailHref = !empty($mailTo) ? $mailTo : 'mailto:' . $contactEmail;

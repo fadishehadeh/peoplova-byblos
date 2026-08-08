@@ -18,3 +18,4 @@ $router->post('/forgot-password',     [AuthController::class, 'sendResetLink'], 
 $router->get('/reset-password/{token}', [AuthController::class, 'showResetPassword'], [GuestMiddleware::class]);
 $router->post('/reset-password',      [AuthController::class, 'resetPassword'],      [GuestMiddleware::class]);
 $router->post('/logout',              [AuthController::class, 'logout'],             [AuthMiddleware::class]);
+$router->post('/dev-login',           [AuthController::class, 'devLogin'],           [GuestMiddleware::class]);
