@@ -253,7 +253,7 @@ final class AttendanceImportRepository
 
             // Upsert attendance_records
             $existing = $this->database->fetch(
-                'SELECT id FROM attendance_records WHERE employee_id = :eid AND DATE(clock_in_time) = :d',
+                'SELECT id FROM attendance_records WHERE employee_id = :eid AND attendance_date = :d',
                 ['eid' => $empId, 'd' => $row['work_date']]
             );
 
@@ -262,14 +262,14 @@ final class AttendanceImportRepository
 
             if ($existing) {
                 $this->database->execute(
-                    'UPDATE attendance_records SET clock_in_time = :ci, clock_out_time = :co, source = \'import\' WHERE id = :id',
-                    ['ci' => $clockIn, 'co' => $clockOut, 'id' => $existing['id']]
+                    'UPDATE attendance_records SET attendance_date = :d, clock_in_time = :ci, clock_out_time = :co, source = \'import\' WHERE id = :id',
+                    ['d' => $row['work_date'], 'ci' => $clockIn, 'co' => $clockOut, 'id' => $existing['id']]
                 );
             } else {
                 $this->database->execute(
-                    'INSERT INTO attendance_records (employee_id, clock_in_time, clock_out_time, source)
-                     VALUES (:eid, :ci, :co, \'import\')',
-                    ['eid' => $empId, 'ci' => $clockIn, 'co' => $clockOut]
+                    'INSERT INTO attendance_records (employee_id, attendance_date, clock_in_time, clock_out_time, source)
+                     VALUES (:eid, :d, :ci, :co, \'import\')',
+                    ['eid' => $empId, 'd' => $row['work_date'], 'ci' => $clockIn, 'co' => $clockOut]
                 );
             }
             $written++;
