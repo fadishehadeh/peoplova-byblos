@@ -63,4 +63,35 @@ document.addEventListener('DOMContentLoaded', function () {
     if (overlay) {
         overlay.addEventListener('click', closeSidebar);
     }
+
+    // Close mobile sidebar when any nav link is clicked
+    if (sidebar) {
+        sidebar.querySelectorAll('.sidebar-link, .sidebar-sublink').forEach(function (link) {
+            link.addEventListener('click', function () {
+                if (sidebar.classList.contains('sidebar-open')) {
+                    sidebar.classList.remove('sidebar-open');
+                    if (overlay) overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+    }
+
+    // Enforce single-open accordion — Bootstrap data-bs-parent can be unreliable
+    document.querySelectorAll('.sidebar-group-toggle').forEach(function (toggle) {
+        toggle.addEventListener('click', function () {
+            var targetId = this.getAttribute('href');
+            if (!targetId) return;
+            document.querySelectorAll('#sidebarNavAccordion .collapse.show').forEach(function (openPane) {
+                if ('#' + openPane.id !== targetId) {
+                    var instance = bootstrap.Collapse.getInstance(openPane);
+                    if (instance) {
+                        instance.hide();
+                    } else {
+                        openPane.classList.remove('show');
+                    }
+                }
+            });
+        });
+    });
 });
