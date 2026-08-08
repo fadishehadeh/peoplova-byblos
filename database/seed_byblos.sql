@@ -203,19 +203,19 @@ VALUES
 
 -- ── Update OT Groups names to be more descriptive ─────────────
 UPDATE ot_groups SET
-    name = 'Group 1 — Press & Production',
+    name = 'Group 1 - Press & Production',
     ot_start_hour = 17, ot_start_minute = 0,
     amount_per_block = 8.00, block_minutes = 90, min_ot_minutes = 30
 WHERE id = 1;
 
 UPDATE ot_groups SET
-    name = 'Group 2 — Management',
+    name = 'Group 2 - Management',
     ot_start_hour = 18, ot_start_minute = 0,
     amount_per_block = 8.00, block_minutes = 90, min_ot_minutes = 30
 WHERE id = 2;
 
 UPDATE ot_groups SET
-    name = 'Group 3 — Admin & Support',
+    name = 'Group 3 - Admin & Support',
     ot_start_hour = 17, ot_start_minute = 30,
     amount_per_block = 8.00, block_minutes = 90, min_ot_minutes = 30
 WHERE id = 3;

@@ -109,6 +109,102 @@ $employeeInitials = trim($employeeInitials) !== '' ? $employeeInitials : 'E';
         </div>
     </div>
 
+        <?php if (has_role(['super_admin', 'hr_only', 'hr_admin']) && ($salary !== null || !empty($employee['ot_group_id']) || (int)($employee['transport_tanks'] ?? 0) > 0 || !empty($payrollHistory))): ?>
+        <div class="card content-card mb-4">
+            <div class="card-body p-4">
+                <h5 class="profile-side-title mb-3"><i class="bi bi-cash-stack"></i> Compensation &amp; Payroll</h5>
+
+                <?php if ($salary !== null): ?>
+                <div class="row g-3 mb-3">
+                    <div class="col-6 col-md-3">
+                        <div class="small text-muted text-uppercase mb-1">Basic Salary</div>
+                        <div class="fw-semibold"><?= e(number_format((float)($salary['basic_salary'] ?? 0), 2)); ?> <span class="text-muted small"><?= e((string)($salary['currency'] ?? 'USD')); ?></span></div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="small text-muted text-uppercase mb-1">Housing</div>
+                        <div class="fw-semibold"><?= e(number_format((float)($salary['housing_allowance'] ?? 0), 2)); ?></div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="small text-muted text-uppercase mb-1">Daman Rate</div>
+                        <div class="fw-semibold"><?= e(number_format((float)($salary['daman_rate'] ?? 3), 2)); ?>%</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="small text-muted text-uppercase mb-1">Income Tax Rate</div>
+                        <div class="fw-semibold"><?= e(number_format((float)($salary['income_tax_rate'] ?? 2), 2)); ?>%</div>
+                    </div>
+                    <?php if ((float)($salary['other_allowances'] ?? 0) > 0): ?>
+                    <div class="col-6 col-md-3">
+                        <div class="small text-muted text-uppercase mb-1">Other Allowances</div>
+                        <div class="fw-semibold"><?= e(number_format((float)$salary['other_allowances'], 2)); ?></div>
+                    </div>
+                    <?php endif; ?>
+                    <div class="col-6 col-md-3">
+                        <div class="small text-muted text-uppercase mb-1">Effective From</div>
+                        <div class="fw-semibold"><?= e((string)($salary['effective_from'] ?? '-')); ?></div>
+                    </div>
+                </div>
+                <hr class="my-3">
+                <?php endif; ?>
+
+                <div class="row g-3 mb-0">
+                    <?php
+                    $otGroupName   = $salary['ot_group_name'] ?? null;
+                    $otStartH      = isset($salary['ot_start_hour']) ? (int)$salary['ot_start_hour'] : null;
+                    $otStartM      = isset($salary['ot_start_minute']) ? (int)$salary['ot_start_minute'] : 0;
+                    $amtBlock      = isset($salary['amount_per_block']) ? (float)$salary['amount_per_block'] : null;
+                    $blockMin      = isset($salary['block_minutes']) ? (int)$salary['block_minutes'] : null;
+                    $tanks         = (int)($employee['transport_tanks'] ?? 0);
+                    ?>
+                    <div class="col-6 col-md-3">
+                        <div class="small text-muted text-uppercase mb-1">OT Group</div>
+                        <div class="fw-semibold"><?= $otGroupName !== null ? e($otGroupName) : '<span class="text-muted">None</span>'; ?></div>
+                        <?php if ($otGroupName !== null && $otStartH !== null): ?>
+                            <div class="text-muted small">OT from <?= e(sprintf('%02d:%02d', $otStartH, $otStartM)); ?> · $<?= e(number_format($amtBlock ?? 0, 2)); ?>/<?= e((string)$blockMin); ?>min block</div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="small text-muted text-uppercase mb-1">Transport Tanks</div>
+                        <div class="fw-semibold"><?= $tanks > 0 ? e((string)$tanks) . ' tank' . ($tanks !== 1 ? 's' : '') : '<span class="text-muted">None</span>'; ?></div>
+                    </div>
+                </div>
+
+                <?php if (!empty($payrollHistory)): ?>
+                <hr class="my-3">
+                <div class="small text-muted text-uppercase mb-2">Recent Payroll Runs</div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless mb-0" style="font-size:.85rem">
+                        <thead class="text-muted">
+                            <tr>
+                                <th>Period</th>
+                                <th class="text-end">Basic</th>
+                                <th class="text-end">OT</th>
+                                <th class="text-end">Transport</th>
+                                <th class="text-end">Gross</th>
+                                <th class="text-end">Net</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($payrollHistory as $ph): ?>
+                            <tr>
+                                <td><?= e(date('M Y', mktime(0,0,0,(int)$ph['period_month'],1,(int)$ph['period_year']))); ?></td>
+                                <td class="text-end"><?= e(number_format((float)($ph['basic_salary'] ?? 0), 2)); ?></td>
+                                <td class="text-end"><?= (float)($ph['ot_amount'] ?? 0) > 0 ? '$'.e(number_format((float)$ph['ot_amount'], 2)) : '<span class="text-muted">—</span>'; ?></td>
+                                <td class="text-end"><?= (float)($ph['transport_amount'] ?? 0) > 0 ? '$'.e(number_format((float)$ph['transport_amount'], 2)) : '<span class="text-muted">—</span>'; ?></td>
+                                <td class="text-end fw-semibold">$<?= e(number_format((float)($ph['gross_total'] ?? 0), 2)); ?></td>
+                                <td class="text-end fw-semibold text-success">$<?= e(number_format((float)($ph['net_total'] ?? 0), 2)); ?></td>
+                                <td><span class="badge <?= (string)($ph['status'] ?? '') === 'finalized' ? 'text-bg-success' : 'text-bg-secondary'; ?>"><?= e(ucfirst((string)($ph['status'] ?? ''))); ?></span></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+
     <div class="col-xl-4 employee-side-column">
         <?php $missingItems = $missingItems ?? ['missing_fields' => [], 'missing_documents' => [], 'missing_fields_count' => 0, 'missing_documents_count' => 0, 'total_missing_count' => 0]; ?>
         <div class="card content-card profile-side-card mb-4">
@@ -153,6 +249,32 @@ $employeeInitials = trim($employeeInitials) !== '' ? $employeeInitials : 'E';
                 <?php endif; ?>
             </div>
         </div>
+
+        <?php if (!empty($leaveBalances)): ?>
+        <div class="card content-card profile-side-card mb-4">
+            <div class="card-body p-4">
+                <h5 class="profile-side-title mb-3"><i class="bi bi-calendar2-check"></i> Leave Balances <span class="text-muted small fw-normal"><?= e(date('Y')); ?></span></h5>
+                <div class="d-grid gap-2">
+                    <?php foreach ($leaveBalances as $lb): ?>
+                    <?php
+                        $closing = (float)($lb['closing_balance'] ?? 0);
+                        $used    = (float)($lb['used_amount'] ?? 0);
+                        $total   = $closing + $used;
+                        $pct     = $total > 0 ? min(100, round($closing / $total * 100)) : 0;
+                        $barCls  = $pct < 20 ? 'bg-danger' : ($pct < 50 ? 'bg-warning' : 'bg-success');
+                    ?>
+                    <div>
+                        <div class="d-flex justify-content-between align-items-baseline mb-1">
+                            <span class="small"><?= e((string)$lb['leave_type_name']); ?></span>
+                            <span class="small fw-semibold"><?= e(number_format($closing, 1)); ?> <span class="text-muted fw-normal">/ <?= e(number_format($total, 1)); ?> days</span></span>
+                        </div>
+                        <div class="progress" style="height:5px"><div class="progress-bar <?= $barCls; ?>" style="width:<?= $pct; ?>%"></div></div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <div class="card content-card profile-side-card mb-4">
             <div class="card-body p-4">

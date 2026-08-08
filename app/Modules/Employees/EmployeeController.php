@@ -147,11 +147,14 @@ final class EmployeeController extends Controller
                 Response::abort(404, 'Employee not found.');
             }
 
-            $contacts   = $this->repository->emergencyContacts($employeeId);
-            $stats      = $this->repository->profileStats($employeeId);
-            $insurance  = $this->repository->findInsurance($employeeId);
-            $documents  = $this->repository->findEmployeeDocuments($employeeId);
-            $missingItems = $this->repository->profileMissingItems($employeeId);
+            $contacts      = $this->repository->emergencyContacts($employeeId);
+            $stats         = $this->repository->profileStats($employeeId);
+            $insurance     = $this->repository->findInsurance($employeeId);
+            $documents     = $this->repository->findEmployeeDocuments($employeeId);
+            $missingItems  = $this->repository->profileMissingItems($employeeId);
+            $salary        = $this->repository->currentSalary($employeeId);
+            $leaveBalances = $this->repository->leaveBalances($employeeId, (int) date('Y'));
+            $payrollHistory= $this->repository->payrollHistory($employeeId, 6);
         } catch (Throwable $throwable) {
             $this->app->session()->flash('error', 'Unable to load employee profile: ' . $throwable->getMessage());
             $this->redirect('/dashboard');
@@ -160,14 +163,17 @@ final class EmployeeController extends Controller
         $this->auditLog('employees', 'employee', $employeeId, 'view', $request->ip(), $request->userAgent());
 
         $this->render('employees.show', [
-            'title'     => 'Employee Profile',
-            'pageTitle' => 'Employee Profile',
-            'employee'  => $employee,
-            'contacts'  => $contacts,
-            'stats'     => $stats,
-            'insurance' => $insurance ?? null,
-            'documents' => $documents,
+            'title'        => 'Employee Profile',
+            'pageTitle'    => 'Employee Profile',
+            'employee'     => $employee,
+            'contacts'     => $contacts,
+            'stats'        => $stats,
+            'insurance'    => $insurance ?? null,
+            'documents'    => $documents,
             'missingItems' => $missingItems,
+            'salary'       => $salary ?? null,
+            'leaveBalances'=> $leaveBalances ?? [],
+            'payrollHistory'=> $payrollHistory ?? [],
         ]);
     }
 

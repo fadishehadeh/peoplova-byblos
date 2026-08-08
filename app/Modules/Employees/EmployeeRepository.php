@@ -1370,4 +1370,46 @@ final class EmployeeRepository
             ['employee_id' => $employeeId]
         );
     }
+
+    public function currentSalary(int $employeeId): ?array
+    {
+        return $this->database->fetch(
+            'SELECT ss.*, og.name AS ot_group_name, og.ot_start_hour, og.ot_start_minute, og.amount_per_block, og.block_minutes, og.min_ot_minutes
+             FROM salary_structures ss
+             LEFT JOIN employees e ON e.id = ss.employee_id
+             LEFT JOIN ot_groups og ON og.id = e.ot_group_id
+             WHERE ss.employee_id = :eid
+             ORDER BY ss.effective_from DESC
+             LIMIT 1',
+            ['eid' => $employeeId]
+        );
+    }
+
+    public function leaveBalances(int $employeeId, int $year): array
+    {
+        return $this->database->fetchAll(
+            'SELECT lb.*, lt.name AS leave_type_name, lt.code AS leave_type_code
+             FROM leave_balances lb
+             JOIN leave_types lt ON lt.id = lb.leave_type_id
+             WHERE lb.employee_id = :eid AND lb.balance_year = :yr
+             ORDER BY lt.name ASC',
+            ['eid' => $employeeId, 'yr' => $year]
+        );
+    }
+
+    public function payrollHistory(int $employeeId, int $limit = 6): array
+    {
+        return $this->database->fetchAll(
+            'SELECT pri.basic_salary, pri.housing_allowance, pri.ot_amount, pri.transport_amount,
+                    pri.daman_deduction, pri.income_tax_deduction, pri.advance_deduction,
+                    pri.deductions, pri.gross_total, pri.net_total,
+                    pr.period_month, pr.period_year, pr.status
+             FROM payroll_run_items pri
+             JOIN payroll_runs pr ON pr.id = pri.payroll_run_id
+             WHERE pri.employee_id = :eid
+             ORDER BY pr.period_year DESC, pr.period_month DESC
+             LIMIT ' . $limit,
+            ['eid' => $employeeId]
+        );
+    }
 }
