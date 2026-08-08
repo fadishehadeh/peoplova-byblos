@@ -253,7 +253,7 @@ final class AttendanceImportRepository
 
             // Upsert attendance_records
             $existing = $this->database->fetch(
-                'SELECT id FROM attendance_records WHERE employee_id = :eid AND DATE(clock_in) = :d',
+                'SELECT id FROM attendance_records WHERE employee_id = :eid AND DATE(clock_in_time) = :d',
                 ['eid' => $empId, 'd' => $row['work_date']]
             );
 
@@ -262,12 +262,12 @@ final class AttendanceImportRepository
 
             if ($existing) {
                 $this->database->execute(
-                    'UPDATE attendance_records SET clock_in = :ci, clock_out = :co, source = \'import\' WHERE id = :id',
+                    'UPDATE attendance_records SET clock_in_time = :ci, clock_out_time = :co, source = \'import\' WHERE id = :id',
                     ['ci' => $clockIn, 'co' => $clockOut, 'id' => $existing['id']]
                 );
             } else {
                 $this->database->execute(
-                    'INSERT INTO attendance_records (employee_id, clock_in, clock_out, source)
+                    'INSERT INTO attendance_records (employee_id, clock_in_time, clock_out_time, source)
                      VALUES (:eid, :ci, :co, \'import\')',
                     ['eid' => $empId, 'ci' => $clockIn, 'co' => $clockOut]
                 );
@@ -324,7 +324,7 @@ final class AttendanceImportRepository
         $endDate   = date('Y-m-t', strtotime($startDate));
 
         $records = $this->database->fetchAll(
-            'SELECT ar.id, ar.employee_id, ar.clock_in, ar.clock_out,
+            'SELECT ar.id, ar.employee_id, ar.clock_in_time AS clock_in, ar.clock_out_time AS clock_out,
                     e.ot_group_id,
                     og.ot_start_hour, og.ot_start_minute,
                     og.amount_per_block, og.block_minutes, og.min_ot_minutes
@@ -332,9 +332,9 @@ final class AttendanceImportRepository
              JOIN employees e ON e.id = ar.employee_id
              LEFT JOIN ot_groups og ON og.id = e.ot_group_id
              WHERE e.company_id = :cid
-               AND ar.clock_in >= :start
-               AND ar.clock_in < :end_after
-               AND ar.clock_out IS NOT NULL',
+               AND ar.clock_in_time >= :start
+               AND ar.clock_in_time < :end_after
+               AND ar.clock_out_time IS NOT NULL',
             ['cid' => $companyId, 'start' => $startDate . ' 00:00:00', 'end_after' => $endDate . ' 23:59:59']
         );
 
