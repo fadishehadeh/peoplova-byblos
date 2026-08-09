@@ -10,6 +10,7 @@ use App\Modules\Payroll\PayrollController;
 use App\Modules\Payroll\OtGroupController;
 use App\Modules\Payroll\FuelPriceController;
 use App\Modules\Payroll\PayrollSettingsController;
+use App\Modules\Payroll\SalaryTemplateController;
 
 $router = $app->router();
 
@@ -39,6 +40,15 @@ $router->post('/payroll/ot-groups/{id}/delete',      [OtGroupController::class, 
 // ── Fuel Prices ───────────────────────────────────────────────────────────────
 $router->get('/payroll/fuel-prices',       [FuelPriceController::class, 'index'], [...$base, $hrRole]);
 $router->post('/payroll/fuel-prices/save', [FuelPriceController::class, 'save'],  [...$base, $hrRole]);
+
+// ── Salary Templates ─────────────────────────────────────────────────────────
+$router->get('/payroll/salary-templates',                  [SalaryTemplateController::class, 'index'],       [...$base, $hrRole]);
+$router->post('/payroll/salary-templates',                 [SalaryTemplateController::class, 'store'],       [...$base, $hrRole]);
+$router->get('/payroll/salary-templates/{id}/edit',        [SalaryTemplateController::class, 'edit'],        [...$base, $hrRole]);
+$router->post('/payroll/salary-templates/{id}/edit',       [SalaryTemplateController::class, 'update'],      [...$base, $hrRole]);
+$router->post('/payroll/salary-templates/{id}/delete',     [SalaryTemplateController::class, 'destroy'],     [...$base, $hrRole]);
+$router->get('/payroll/salary-templates/{id}/apply',       [SalaryTemplateController::class, 'applyForm'],   [...$base, $hrRole]);
+$router->post('/payroll/salary-templates/{id}/apply',      [SalaryTemplateController::class, 'applySubmit'], [...$base, $hrRole]);
 
 // ── Payroll Settings ──────────────────────────────────────────────────────────
 $router->get('/payroll/settings',       [PayrollSettingsController::class, 'index'], [...$base, $hrRole]);

@@ -255,7 +255,8 @@ $userName    = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '
                 </a>
                 <div class="collapse <?= e($payrollOpen); ?>" id="<?= e($payrollId); ?>" data-bs-parent="#sidebarNavAccordion">
                     <div class="sidebar-collapse-body">
-                        <a href="<?= e(url('/payroll/salary-structures')); ?>" class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/salary') ? ' active' : ''; ?>">Salary Structures</a>
+                        <a href="<?= e(url('/payroll/salary-structures')); ?>"  class="sidebar-sublink<?= (str_starts_with($currentPath, '/payroll/salary-s') && !str_starts_with($currentPath, '/payroll/salary-t')) ? ' active' : ''; ?>">Salary Structures</a>
+                        <a href="<?= e(url('/payroll/salary-templates')); ?>"  class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/salary-t') ? ' active' : ''; ?>">Salary Templates</a>
                         <a href="<?= e(url('/payroll/runs')); ?>"              class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/runs') ? ' active' : ''; ?>">Payroll Runs</a>
                         <a href="<?= e(url('/payroll/ot-groups')); ?>"         class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/ot-groups') ? ' active' : ''; ?>">OT Groups</a>
                         <a href="<?= e(url('/payroll/fuel-prices')); ?>"       class="sidebar-sublink<?= str_starts_with($currentPath, '/payroll/fuel-prices') ? ' active' : ''; ?>">Fuel Prices</a>
